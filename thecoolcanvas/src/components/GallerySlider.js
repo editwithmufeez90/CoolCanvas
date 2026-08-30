@@ -93,6 +93,10 @@ export function GallerySlider() {
              <ChevronLeft className="w-6 h-6" />
            </button>
 
+           <style dangerouslySetInnerHTML={{__html: `
+             .hide-scrollbar::-webkit-scrollbar { display: none; }
+           `}} />
+
            <div 
              ref={scrollContainerRef}
              onScroll={handleScroll}
@@ -100,12 +104,9 @@ export function GallerySlider() {
              onMouseLeave={handleMouseLeave}
              onMouseUp={handleMouseUp}
              onMouseMove={handleMouseMove}
-             className={`flex overflow-x-auto snap-x snap-mandatory scroll-smooth ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+             className={`flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
            >
-             <style dangerouslySetInnerHTML={{__html: `
-               div::-webkit-scrollbar { display: none; }
-             `}} />
              {uniqueImages.map((img, idx) => (
                 <div 
                   key={idx} 

@@ -87,6 +87,10 @@ export function VideoSlider() {
         </button>
       )}
 
+      <style dangerouslySetInnerHTML={{__html: `
+        .hide-scrollbar-video::-webkit-scrollbar { display: none; }
+      `}} />
+
       <div 
         ref={scrollContainerRef}
         onScroll={handleScroll}
@@ -94,12 +98,9 @@ export function VideoSlider() {
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-        className={`flex overflow-x-auto snap-x snap-mandatory scroll-smooth ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+        className={`flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar-video ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        <style dangerouslySetInnerHTML={{__html: `
-          div::-webkit-scrollbar { display: none; }
-        `}} />
         {items.map((item, index) => (
           <div 
             key={index} 
