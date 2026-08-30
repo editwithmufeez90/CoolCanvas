@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export function VideoSlider() {
   const items = [
@@ -11,37 +11,57 @@ export function VideoSlider() {
   ];
 
   const [current, setCurrent] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(2);
+  const scrollContainerRef = useRef(null);
+  const [maxIndex, setMaxIndex] = useState(0);
 
   useEffect(() => {
-    const updateItemsPerView = () => {
-      if (window.innerWidth >= 1024) {
-        setItemsPerView(4);
-      } else if (window.innerWidth >= 768) {
-        setItemsPerView(3);
-      } else {
-        setItemsPerView(2);
+    const updateMax = () => {
+      if (!scrollContainerRef.current) return;
+      const container = scrollContainerRef.current;
+      const itemWidth = container.children[0]?.offsetWidth || 0;
+      if (itemWidth > 0) {
+        const visibleItems = Math.round(container.clientWidth / itemWidth);
+        setMaxIndex(Math.max(0, items.length - visibleItems));
       }
     };
     
-    updateItemsPerView();
-    window.addEventListener('resize', updateItemsPerView);
-    return () => window.removeEventListener('resize', updateItemsPerView);
-  }, []);
+    updateMax();
+    window.addEventListener('resize', updateMax);
+    return () => window.removeEventListener('resize', updateMax);
+  }, [items.length]);
 
-  const maxIndex = Math.max(0, items.length - itemsPerView);
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const itemWidth = container.children[0]?.offsetWidth || 0;
+    if (itemWidth > 0) {
+      const newIndex = Math.round(container.scrollLeft / itemWidth);
+      if (newIndex !== current) setCurrent(newIndex);
+    }
+  };
+
+  const scrollToSlide = (index) => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const itemWidth = container.children[0]?.offsetWidth || 0;
+    container.scrollTo({ left: index * itemWidth, behavior: 'smooth' });
+  };
 
   return (
     <div className="relative w-full overflow-hidden pb-12">
       <div 
-        className="flex transition-transform duration-500 ease-out"
-        style={{ transform: `translateX(-${current * (100 / itemsPerView)}%)` }}
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
+        <style dangerouslySetInnerHTML={{__html: `
+          div::-webkit-scrollbar { display: none; }
+        `}} />
         {items.map((item, index) => (
           <div 
             key={index} 
-            className="shrink-0 px-2 sm:px-3"
-            style={{ width: `${100 / itemsPerView}%` }}
+            className="flex-none w-[50%] md:w-[33.333333%] lg:w-[25%] snap-start px-2 sm:px-3"
           >
             <div className="relative aspect-[9/16] rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
               {item.type === 'video' ? (
@@ -49,7 +69,7 @@ export function VideoSlider() {
                   <source src={item.src} type="video/mp4" />
                 </video>
               ) : (
-                <img src={item.src} alt={`Influencer ${index + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                <img src={item.src} alt={`Influencer ${index + 1}`} className="absolute inset-0 w-full h-full object-cover" draggable="false" />
               )}
             </div>
           </div>
@@ -61,7 +81,7 @@ export function VideoSlider() {
         {Array.from({ length: maxIndex + 1 }).map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrent(index)}
+            onClick={() => scrollToSlide(index)}
             className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
               current === index 
                 ? "bg-black w-6 md:w-8" 
