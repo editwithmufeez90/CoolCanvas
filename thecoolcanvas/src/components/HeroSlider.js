@@ -18,6 +18,32 @@ export function HeroSlider() {
     : originalBanners;
 
   const [current, setCurrent] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      setCurrent((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+    } else if (isRightSwipe) {
+      setCurrent((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -40,7 +66,12 @@ export function HeroSlider() {
   };
 
   return (
-    <div className="relative w-full overflow-hidden bg-gray-50 py-10 lg:py-16">
+    <div 
+      className="relative w-full overflow-hidden bg-gray-50 py-10 lg:py-16"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       
       {/* Invisible placeholder to define the height of the slider dynamically based on the image size */}
       <div className="w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] mx-auto opacity-0 pointer-events-none">
