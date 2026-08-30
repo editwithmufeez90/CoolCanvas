@@ -6,7 +6,7 @@ import { useState, use } from "react";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
-import { Minus, Plus, Check } from "lucide-react";
+import { Minus, Plus, Check, Share2 } from "lucide-react";
 
 export default function ProductPage({ params }) {
   const unwrappedParams = use(params);
@@ -41,6 +41,25 @@ export default function ProductPage({ params }) {
 
   const handleIncreaseQuantity = () => {
     if (quantity < (product.stock || 10)) setQuantity(q => q + 1);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: product.title,
+      text: `Check out ${product.title} on CoolCanvas!`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log("Error sharing:", err);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert("Link copied to clipboard!");
+    }
   };
 
   // Get other products for "You may also like"
@@ -79,10 +98,22 @@ export default function ProductPage({ params }) {
 
           {/* Right Column: Details */}
           <div className="mt-10 lg:mt-0">
-            <p className="text-gray-500 uppercase tracking-widest text-sm mb-2 font-medium">Coolcanvas</p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-gray-900 leading-tight mb-4">
-              {product.title}
-            </h1>
+            <div className="flex justify-between items-start gap-4 mb-4">
+              <div>
+                <p className="text-gray-500 uppercase tracking-widest text-sm mb-2 font-medium">Coolcanvas</p>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-gray-900 leading-tight">
+                  {product.title}
+                </h1>
+              </div>
+              <button 
+                onClick={handleShare}
+                className="p-3 lg:p-4 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors shrink-0 mt-1 lg:mt-3"
+                aria-label="Share product"
+                title="Share this product"
+              >
+                <Share2 className="w-5 h-5 lg:w-6 lg:h-6 text-gray-700" />
+              </button>
+            </div>
             
             {/* Pricing */}
             <div className="flex items-center gap-3 mb-2">
