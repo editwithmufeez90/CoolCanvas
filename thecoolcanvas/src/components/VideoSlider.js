@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function VideoSlider() {
   const items = [
@@ -13,6 +14,9 @@ export function VideoSlider() {
   const [current, setCurrent] = useState(0);
   const scrollContainerRef = useRef(null);
   const [maxIndex, setMaxIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftPos, setScrollLeftPos] = useState(0);
 
   useEffect(() => {
     const updateMax = () => {
@@ -40,6 +44,21 @@ export function VideoSlider() {
     }
   };
 
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeftPos(scrollContainerRef.current.scrollLeft);
+  };
+  const handleMouseLeave = () => setIsDragging(false);
+  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    scrollContainerRef.current.scrollLeft = scrollLeftPos - walk;
+  };
+
   const scrollToSlide = (index) => {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
@@ -47,12 +66,35 @@ export function VideoSlider() {
     container.scrollTo({ left: index * itemWidth, behavior: 'smooth' });
   };
 
+  const nextSlide = () => {
+    if (current < maxIndex) scrollToSlide(current + 1);
+  };
+
+  const prevSlide = () => {
+    if (current > 0) scrollToSlide(current - 1);
+  };
+
   return (
-    <div className="relative w-full overflow-hidden pb-12">
+    <div className="relative w-full overflow-hidden pb-12 group">
+      
+      {/* Floating Left Arrow */}
+      {current > 0 && (
+        <button 
+          onClick={prevSlide}
+          className="absolute left-2 top-1/2 -translate-y-1/2 -mt-6 z-10 bg-white/80 backdrop-blur hover:bg-white text-black p-3 rounded-full shadow-lg hidden md:group-hover:flex transition-all"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+      )}
+
       <div 
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        className={`flex overflow-x-auto snap-x snap-mandatory scroll-smooth ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <style dangerouslySetInnerHTML={{__html: `
@@ -61,7 +103,7 @@ export function VideoSlider() {
         {items.map((item, index) => (
           <div 
             key={index} 
-            className="flex-none w-[50%] md:w-[33.333333%] lg:w-[25%] snap-start px-2 sm:px-3"
+            className="flex-none w-[70%] md:w-[33.333333%] lg:w-[25%] snap-start px-2 sm:px-3"
           >
             <div className="relative aspect-[9/16] rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
               {item.type === 'video' ? (
@@ -75,6 +117,16 @@ export function VideoSlider() {
           </div>
         ))}
       </div>
+
+      {/* Floating Right Arrow */}
+      {current < maxIndex && (
+        <button 
+          onClick={nextSlide}
+          className="absolute right-2 top-1/2 -translate-y-1/2 -mt-6 z-10 bg-white/80 backdrop-blur hover:bg-white text-black p-3 rounded-full shadow-lg hidden md:group-hover:flex transition-all"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+      )}
 
       {/* Bullets */}
       <div className={`absolute bottom-0 left-0 right-0 flex justify-center gap-3 z-10 transition-opacity ${maxIndex > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>

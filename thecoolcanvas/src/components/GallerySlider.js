@@ -10,6 +10,9 @@ export function GallerySlider() {
   
   const [current, setCurrent] = useState(0);
   const scrollContainerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftPos, setScrollLeftPos] = useState(0);
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
@@ -19,6 +22,21 @@ export function GallerySlider() {
       const newIndex = Math.round(container.scrollLeft / itemWidth);
       if (newIndex !== current) setCurrent(newIndex);
     }
+  };
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeftPos(scrollContainerRef.current.scrollLeft);
+  };
+  const handleMouseLeave = () => setIsDragging(false);
+  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    scrollContainerRef.current.scrollLeft = scrollLeftPos - walk;
   };
 
   const nextSlide = () => {
@@ -58,33 +76,31 @@ export function GallerySlider() {
     <div className="w-full bg-white py-16 border-t border-gray-100">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Navigation Header */}
         <div className="flex justify-center items-center mb-8 gap-8 text-gray-400">
-          <button 
-            onClick={prevSlide} 
-            className="hover:text-black transition-transform hover:-translate-x-1 p-2"
-            aria-label="Previous image"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
           <span className="text-sm font-semibold tracking-[0.2em] text-gray-900">
             GALLERY
           </span>
-          <button 
-            onClick={nextSlide} 
-            className="hover:text-black transition-transform hover:translate-x-1 p-2"
-            aria-label="Next image"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
         </div>
 
         {/* Carousel Slider */}
-        <div className="relative w-full">
+        <div className="relative w-full group">
+           
+           {/* Floating Left Arrow */}
+           <button 
+             onClick={prevSlide}
+             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur hover:bg-white text-black p-3 rounded-full shadow-lg hidden md:group-hover:flex transition-all"
+           >
+             <ChevronLeft className="w-6 h-6" />
+           </button>
+
            <div 
              ref={scrollContainerRef}
              onScroll={handleScroll}
-             className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
+             onMouseDown={handleMouseDown}
+             onMouseLeave={handleMouseLeave}
+             onMouseUp={handleMouseUp}
+             onMouseMove={handleMouseMove}
+             className={`flex overflow-x-auto snap-x snap-mandatory scroll-smooth ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
            >
              <style dangerouslySetInnerHTML={{__html: `
@@ -93,7 +109,7 @@ export function GallerySlider() {
              {uniqueImages.map((img, idx) => (
                 <div 
                   key={idx} 
-                  className="flex-none w-[50%] md:w-[33.333333%] lg:w-[25%] xl:w-[20%] snap-start px-2 sm:px-3"
+                  className="flex-none w-[75%] md:w-[33.333333%] lg:w-[25%] xl:w-[20%] snap-start px-2 sm:px-3"
                 >
                   <div className="aspect-[4/5] rounded-[2rem] overflow-hidden bg-gray-100 shadow-sm hover:shadow-xl transition-shadow duration-300">
                     <img 
@@ -106,6 +122,14 @@ export function GallerySlider() {
                 </div>
              ))}
            </div>
+
+           {/* Floating Right Arrow */}
+           <button 
+             onClick={nextSlide}
+             className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur hover:bg-white text-black p-3 rounded-full shadow-lg hidden md:group-hover:flex transition-all"
+           >
+             <ChevronRight className="w-6 h-6" />
+           </button>
         </div>
 
       </div>
