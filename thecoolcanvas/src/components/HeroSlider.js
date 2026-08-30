@@ -19,30 +19,35 @@ export function HeroSlider() {
 
   const [current, setCurrent] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const minSwipeDistance = 50;
 
   const handleTouchStart = (e) => {
-    setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
+    setIsDragging(true);
+    setDragOffset(0);
   };
 
   const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (touchStart === null) return;
+    const currentTouch = e.targetTouches[0].clientX;
+    setDragOffset(currentTouch - touchStart);
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe) {
-      setCurrent((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
-    } else if (isRightSwipe) {
+    setIsDragging(false);
+    if (touchStart === null) return;
+    
+    if (dragOffset > minSwipeDistance) {
       setCurrent((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+    } else if (dragOffset < -minSwipeDistance) {
+      setCurrent((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
     }
+    
+    setTouchStart(null);
+    setDragOffset(0);
   };
 
   useEffect(() => {
@@ -121,9 +126,9 @@ export function HeroSlider() {
           return (
             <div 
               key={index} 
-              className={`absolute top-0 h-full w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] transition-all duration-700 ease-out left-1/2 ${isCenter ? 'cursor-auto' : 'cursor-pointer'}`}
+              className={`absolute top-0 h-full w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] left-1/2 ${isCenter ? 'cursor-auto' : 'cursor-pointer'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
               style={{
-                transform: `translateX(${translateX}) scale(${scale})`,
+                transform: `translateX(calc(${translateX} + ${dragOffset}px)) scale(${scale})`,
                 zIndex,
                 opacity
               }}
@@ -131,7 +136,7 @@ export function HeroSlider() {
                 if (isLeft || isRight) setCurrent(index);
               }}
             >
-              <Link href="#shop" className={`block w-full h-full transition-all duration-700 rounded-2xl overflow-hidden shadow-2xl ${blur} ${!isCenter && 'pointer-events-none'}`}>
+              <Link href="#shop" className={`block w-full h-full rounded-2xl overflow-hidden shadow-2xl ${blur} ${!isCenter && 'pointer-events-none'} ${isDragging ? 'transition-none' : 'transition-all duration-700'}`}>
                 <img src={banner} className="w-full h-full object-cover" alt={`Banner ${index + 1}`} />
               </Link>
             </div>
