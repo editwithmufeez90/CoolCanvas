@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 export function HeroSlider() {
-  const originalBanners = [
+  const banners = [
     "/images/banner_new/IMG_20260829_224249.jpg.jpeg",
     "/images/banner_new/IMG_20260829_224310.jpg.jpeg", 
     "/images/banner_new/IMG_20260829_224326.jpg.jpeg",
@@ -12,144 +12,100 @@ export function HeroSlider() {
     "/images/banner_new/IMG_20260829_224357.jpg.jpeg"
   ];
 
-  // Ensure we always have at least 3 banners for the 3D effect to work
-  const banners = originalBanners.length < 3 
-    ? [...originalBanners, ...originalBanners, ...originalBanners].slice(0, 3)
-    : originalBanners;
-
   const [current, setCurrent] = useState(0);
-  const [touchStart, setTouchStart] = useState(null);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const scrollContainerRef = useRef(null);
 
-  const minSwipeDistance = 50;
-
-  const handleTouchStart = (e) => {
-    setTouchStart(e.targetTouches[0].clientX);
-    setIsDragging(true);
-    setDragOffset(0);
-  };
-
-  const handleTouchMove = (e) => {
-    if (touchStart === null) return;
-    const currentTouch = e.targetTouches[0].clientX;
-    setDragOffset(currentTouch - touchStart);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    if (touchStart === null) return;
+  // Handle manual scroll to update pagination dots
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
     
-    if (dragOffset > minSwipeDistance) {
-      setCurrent((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
-    } else if (dragOffset < -minSwipeDistance) {
-      setCurrent((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+    // Calculate which item is currently centered
+    const scrollPosition = container.scrollLeft;
+    // We get the first child to measure its width + gap (approximate)
+    const itemWidth = container.scrollWidth / banners.length;
+    
+    if (itemWidth > 0) {
+      const newIndex = Math.round(scrollPosition / itemWidth);
+      // Ensure index is within bounds
+      const safeIndex = Math.max(0, Math.min(newIndex, banners.length - 1));
+      if (safeIndex !== current) {
+        setCurrent(safeIndex);
+      }
     }
-    
-    setTouchStart(null);
-    setDragOffset(0);
   };
 
+  // Auto-scroll logic
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+      if (!scrollContainerRef.current) return;
+      
+      const container = scrollContainerRef.current;
+      const itemWidth = container.scrollWidth / banners.length;
+      
+      const isLastSlide = current === banners.length - 1;
+      const nextIndex = isLastSlide ? 0 : current + 1;
+      
+      container.scrollTo({
+        left: nextIndex * itemWidth,
+        behavior: "smooth"
+      });
+      
     }, 4000);
+    
     return () => clearInterval(timer);
-  }, [banners.length]);
+  }, [current, banners.length]);
 
-  const getOffset = (index) => {
-    let diff = index - current;
-    const total = banners.length;
+  const scrollToSlide = (index) => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const itemWidth = container.scrollWidth / banners.length;
     
-    if (diff > Math.floor(total / 2)) {
-      diff -= total;
-    } else if (diff < -Math.floor(total / 2)) {
-      diff += total;
-    }
-    
-    return diff;
+    container.scrollTo({
+      left: index * itemWidth,
+      behavior: "smooth"
+    });
   };
 
   return (
-    <div 
-      className="relative w-full overflow-hidden bg-gray-50 py-10 lg:py-16"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="relative w-full bg-gray-50 py-6 lg:py-12">
       
-      {/* Invisible placeholder to define the height of the slider dynamically based on the image size */}
-      <div className="w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] mx-auto opacity-0 pointer-events-none">
-        <img src={banners[0]} className="w-full h-auto" alt="placeholder" />
-      </div>
-
-      <div className="absolute inset-0 top-10 lg:top-16 bottom-10 lg:bottom-16 overflow-hidden">
-        {banners.map((banner, index) => {
-          const offset = getOffset(index);
-          const isCenter = offset === 0;
-          const isLeft = offset === -1;
-          const isRight = offset === 1;
-
-          let translateX = "-50%";
-          let scale = 1;
-          let zIndex = 0;
-          let opacity = 0;
-          let blur = "blur-none";
-
-          if (isCenter) {
-            translateX = "-50%";
-            scale = 1;
-            zIndex = 30;
-            opacity = 1;
-            blur = "blur-[0.5px]";
-          } else if (isLeft) {
-            translateX = "-120%"; 
-            scale = 0.85;
-            zIndex = 20;
-            opacity = 0.6;
-            blur = "blur-[2px]";
-          } else if (isRight) {
-            translateX = "20%"; 
-            scale = 0.85;
-            zIndex = 20;
-            opacity = 0.6;
-            blur = "blur-[2px]";
-          } else {
-            // Hidden items behind the stack
-            translateX = "-50%";
-            scale = 0.5;
-            zIndex = 10;
-            opacity = 0;
-            blur = "blur-md";
+      {/* Native Scrollable Container */}
+      <div 
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 pb-4 scroll-smooth"
+        style={{ 
+          scrollbarWidth: 'none', /* Firefox */
+          msOverflowStyle: 'none' /* IE and Edge */
+        }}
+      >
+        <style dangerouslySetInnerHTML={{__html: `
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          div::-webkit-scrollbar {
+            display: none;
           }
-
-          return (
-            <div 
-              key={index} 
-              className={`absolute top-0 h-full w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] left-1/2 ${isCenter ? 'cursor-auto' : 'cursor-pointer'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
-              style={{
-                transform: `translateX(calc(${translateX} + ${dragOffset}px)) scale(${scale})`,
-                zIndex,
-                opacity
-              }}
-              onClick={() => {
-                if (isLeft || isRight) setCurrent(index);
-              }}
-            >
-              <Link href="#shop" className={`block w-full h-full rounded-2xl overflow-hidden shadow-2xl ${blur} ${!isCenter && 'pointer-events-none'} ${isDragging ? 'transition-none' : 'transition-all duration-700'}`}>
-                <img src={banner} className="w-full h-full object-cover" alt={`Banner ${index + 1}`} />
-              </Link>
-            </div>
-          );
-        })}
+        `}} />
+        
+        {/* We map original banners */}
+        {banners.map((banner, index) => (
+          <div 
+            key={index} 
+            className="flex-none w-[90%] sm:w-[85%] md:w-[60%] lg:w-[45%] max-w-[1000px] snap-center"
+          >
+            <Link href="#shop" className="block w-full h-full rounded-2xl overflow-hidden shadow-xl">
+              <img src={banner} className="w-full h-auto object-cover" alt={`Banner ${index + 1}`} />
+            </Link>
+          </div>
+        ))}
       </div>
 
       {/* Bullet Slider Controls */}
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3 z-40">
+      <div className="absolute bottom-2 lg:bottom-4 left-0 right-0 flex justify-center gap-3 z-40">
         {banners.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrent(index)}
+            onClick={() => scrollToSlide(index)}
             className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
               current === index 
                 ? "bg-black w-6 md:w-8" 
