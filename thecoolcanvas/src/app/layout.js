@@ -7,6 +7,9 @@ import "./globals.css";
 export const metadata = {
   title: "The Cool Canvas | Premium Streetwear",
   description: "Ultra-fast custom streetwear e-commerce storefront.",
+  icons: {
+    icon: '/images/logo.png',
+  },
 };
 
 export default function RootLayout({ children }) {
