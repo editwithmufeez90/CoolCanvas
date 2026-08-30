@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export function HeroSlider() {
-  const banners = [
+  const originalBanners = [
     "/images/banner_new/IMG_20260829_224249.jpg.jpeg",
     "/images/banner_new/IMG_20260829_224310.jpg.jpeg", 
     "/images/banner_new/IMG_20260829_224326.jpg.jpeg",
@@ -12,100 +12,157 @@ export function HeroSlider() {
     "/images/banner_new/IMG_20260829_224357.jpg.jpeg"
   ];
 
+  // Ensure we always have at least 3 banners for the 3D effect to work
+  const banners = originalBanners.length < 3 
+    ? [...originalBanners, ...originalBanners, ...originalBanners].slice(0, 3)
+    : originalBanners;
+
   const [current, setCurrent] = useState(0);
-  const scrollContainerRef = useRef(null);
+  const [touchStart, setTouchStart] = useState(null);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
-  // Handle manual scroll to update pagination dots
-  const handleScroll = () => {
-    if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (clientX) => {
+    setTouchStart(clientX);
+    setIsDragging(true);
+    setDragOffset(0);
+  };
+
+  const handleTouchMove = (clientX) => {
+    if (touchStart === null) return;
+    setDragOffset(clientX - touchStart);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (touchStart === null) return;
     
-    // Calculate which item is currently centered
-    const scrollPosition = container.scrollLeft;
-    // We get the first child to measure its width + gap (approximate)
-    const itemWidth = container.scrollWidth / banners.length;
-    
-    if (itemWidth > 0) {
-      const newIndex = Math.round(scrollPosition / itemWidth);
-      // Ensure index is within bounds
-      const safeIndex = Math.max(0, Math.min(newIndex, banners.length - 1));
-      if (safeIndex !== current) {
-        setCurrent(safeIndex);
-      }
+    if (dragOffset > minSwipeDistance) {
+      setCurrent((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+    } else if (dragOffset < -minSwipeDistance) {
+      setCurrent((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
     }
+    
+    setTouchStart(null);
+    setDragOffset(0);
   };
 
-  // Auto-scroll logic
   useEffect(() => {
+    if (isDragging) return; // Pause auto-play while dragging
     const timer = setInterval(() => {
-      if (!scrollContainerRef.current) return;
-      
-      const container = scrollContainerRef.current;
-      const itemWidth = container.scrollWidth / banners.length;
-      
-      const isLastSlide = current === banners.length - 1;
-      const nextIndex = isLastSlide ? 0 : current + 1;
-      
-      container.scrollTo({
-        left: nextIndex * itemWidth,
-        behavior: "smooth"
-      });
-      
+      setCurrent((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
     }, 4000);
-    
     return () => clearInterval(timer);
-  }, [current, banners.length]);
+  }, [banners.length, isDragging]);
 
-  const scrollToSlide = (index) => {
-    if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
-    const itemWidth = container.scrollWidth / banners.length;
+  const getOffset = (index) => {
+    let diff = index - current;
+    const total = banners.length;
     
-    container.scrollTo({
-      left: index * itemWidth,
-      behavior: "smooth"
-    });
+    if (diff > Math.floor(total / 2)) {
+      diff -= total;
+    } else if (diff < -Math.floor(total / 2)) {
+      diff += total;
+    }
+    
+    return diff;
   };
+
+  // Estimate item width for dragging calculation (65% of screen on mobile, max 1000)
+  const itemWidth = typeof window !== "undefined" ? Math.min(window.innerWidth * 0.65, 1000) : 300;
+  // How much of the item width we have dragged (e.g., -0.5 to 0.5)
+  const dragProgress = isDragging ? dragOffset / itemWidth : 0;
 
   return (
-    <div className="relative w-full bg-gray-50 py-6 lg:py-12">
+    <div 
+      className="relative w-full overflow-hidden bg-gray-50 py-10 lg:py-16 select-none"
+      onTouchStart={(e) => handleTouchStart(e.targetTouches[0].clientX)}
+      onTouchMove={(e) => handleTouchMove(e.targetTouches[0].clientX)}
+      onTouchEnd={handleTouchEnd}
+      // Mouse drag support for desktop testing
+      onMouseDown={(e) => handleTouchStart(e.clientX)}
+      onMouseMove={(e) => {
+        if (isDragging) handleTouchMove(e.clientX);
+      }}
+      onMouseUp={handleTouchEnd}
+      onMouseLeave={handleTouchEnd}
+    >
       
-      {/* Native Scrollable Container */}
-      <div 
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 pb-4 scroll-smooth"
-        style={{ 
-          scrollbarWidth: 'none', /* Firefox */
-          msOverflowStyle: 'none' /* IE and Edge */
-        }}
-      >
-        <style dangerouslySetInnerHTML={{__html: `
-          /* Hide scrollbar for Chrome, Safari and Opera */
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}} />
-        
-        {/* We map original banners */}
-        {banners.map((banner, index) => (
-          <div 
-            key={index} 
-            className="flex-none w-[90%] sm:w-[85%] md:w-[60%] lg:w-[45%] max-w-[1000px] snap-center"
-          >
-            <Link href="#shop" className="block w-full h-full rounded-2xl overflow-hidden shadow-xl">
-              <img src={banner} className="w-full h-auto object-cover" alt={`Banner ${index + 1}`} />
-            </Link>
-          </div>
-        ))}
+      {/* Invisible placeholder to define the height of the slider dynamically based on the image size */}
+      <div className="w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] mx-auto opacity-0 pointer-events-none">
+        <img src={banners[0]} className="w-full h-auto" alt="placeholder" />
+      </div>
+
+      <div className="absolute inset-0 top-10 lg:top-16 bottom-10 lg:bottom-16 overflow-hidden">
+        {banners.map((banner, index) => {
+          // Base integer offset (-2, -1, 0, 1, 2)
+          const baseOffset = getOffset(index);
+          
+          // Continuous offset factors in the drag progress. 
+          // If we drag left (negative dragOffset), dragProgress is negative. 
+          // A center item (0) shifts towards left (- offset).
+          const continuousOffset = baseOffset + dragProgress;
+          
+          const absOffset = Math.abs(continuousOffset);
+
+          // Interpolated values
+          // Position: -50% is center, -120% is left, 20% is right. 
+          // It shifts by 70% per offset unit.
+          const translateX = -50 + continuousOffset * 70;
+          
+          // Scale: 1 at center, drops by 0.15 per unit.
+          const scale = Math.max(0.5, 1 - absOffset * 0.15);
+          
+          // Opacity: 1 at center, drops to 0 at offset >= 2
+          const opacity = Math.max(0, 1 - absOffset * 0.5);
+          
+          // Z-Index: Highest at center.
+          const zIndex = Math.round(30 - absOffset * 10);
+          
+          // Blur: 0 at center, 2px at side.
+          const blurValue = absOffset * 2;
+
+          // Only enable pointer events on the roughly centered item
+          const isCenterPointer = absOffset < 0.5;
+
+          return (
+            <div 
+              key={index} 
+              className={`absolute top-0 h-full w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] left-1/2 ${isCenterPointer ? 'cursor-auto' : 'cursor-pointer'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
+              style={{
+                transform: `translateX(${translateX}%) scale(${scale})`,
+                zIndex,
+                opacity
+              }}
+              onClick={() => {
+                if (!isCenterPointer && !isDragging) {
+                  setCurrent(index);
+                }
+              }}
+            >
+              <Link 
+                href="#shop" 
+                className={`block w-full h-full rounded-2xl overflow-hidden shadow-2xl ${!isCenterPointer && 'pointer-events-none'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
+                style={{ filter: `blur(${blurValue}px)` }}
+                onClick={(e) => {
+                  if (Math.abs(dragOffset) > 10) e.preventDefault();
+                }}
+              >
+                <img src={banner} className="w-full h-full object-cover" alt={`Banner ${index + 1}`} draggable="false" />
+              </Link>
+            </div>
+          );
+        })}
       </div>
 
       {/* Bullet Slider Controls */}
-      <div className="absolute bottom-2 lg:bottom-4 left-0 right-0 flex justify-center gap-3 z-40">
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3 z-40">
         {banners.map((_, index) => (
           <button
             key={index}
-            onClick={() => scrollToSlide(index)}
+            onClick={() => setCurrent(index)}
             className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
               current === index 
                 ? "bg-black w-6 md:w-8" 
