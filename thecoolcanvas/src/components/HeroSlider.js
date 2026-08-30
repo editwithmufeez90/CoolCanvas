@@ -70,8 +70,8 @@ export function HeroSlider() {
     return diff;
   };
 
-  // Estimate item width for dragging calculation (65% of screen on mobile, max 1000)
-  const itemWidth = typeof window !== "undefined" ? Math.min(window.innerWidth * 0.65, 1000) : 300;
+  // Estimate item width for dragging calculation
+  const itemWidth = typeof window !== "undefined" ? Math.min(window.innerWidth * 0.85, 1200) : 300;
   // How much of the item width we have dragged (e.g., -0.5 to 0.5)
   const dragProgress = isDragging ? dragOffset / itemWidth : 0;
 
@@ -91,7 +91,7 @@ export function HeroSlider() {
     >
       
       {/* Invisible placeholder to define the height of the slider dynamically based on the image size */}
-      <div className="w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] mx-auto opacity-0 pointer-events-none">
+      <div className="w-[85%] md:w-[65%] lg:w-[55%] max-w-[1200px] mx-auto opacity-0 pointer-events-none">
         <img src={banners[0]} className="w-full h-auto" alt="placeholder" />
       </div>
 
@@ -108,9 +108,8 @@ export function HeroSlider() {
           const absOffset = Math.abs(continuousOffset);
 
           // Interpolated values
-          // Position: -50% is center, -120% is left, 20% is right. 
-          // It shifts by 70% per offset unit.
-          const translateX = -50 + continuousOffset * 70;
+          // Position: -50% is center. Shifts by 85% per offset unit for proper spacing with wider banners.
+          const translateX = -50 + continuousOffset * 85;
           
           // Scale: 1 at center, drops by 0.15 per unit.
           const scale = Math.max(0.5, 1 - absOffset * 0.15);
@@ -130,7 +129,7 @@ export function HeroSlider() {
           return (
             <div 
               key={index} 
-              className={`absolute top-0 h-full w-[65%] md:w-[50%] lg:w-[40%] max-w-[1000px] left-1/2 ${isCenterPointer ? 'cursor-auto' : 'cursor-pointer'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
+              className={`absolute top-0 h-full w-[85%] md:w-[65%] lg:w-[55%] max-w-[1200px] left-1/2 ${isCenterPointer ? 'cursor-auto' : 'cursor-pointer'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
               style={{
                 transform: `translateX(${translateX}%) scale(${scale})`,
                 zIndex,
