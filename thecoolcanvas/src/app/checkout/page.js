@@ -49,7 +49,7 @@ export default function CheckoutPage() {
     const orderDetails = `New Order from ${formData.name}!
 
 Products:
-${checkoutCart.map(item => `- ${item.title} (Size: ${item.size}, Qty: ${item.quantity}) - Rs. ${item.salePrice * item.quantity}`).join('\n')}
+${checkoutCart.map(item => `- ${item.title} (Size: ${item.size}, Qty: ${item.quantity}) - Rs. ${item.salePrice * item.quantity}\n  Product Image: ${window.location.origin}${item.image}`).join('\n\n')}
 
 Total: Rs. ${checkoutTotal}
 
