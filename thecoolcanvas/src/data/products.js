@@ -7,7 +7,10 @@ export const products = [
     salePrice: 799,
     image: "/images/aggression-1.png",
     gallery: [
-      "/images/aggression-1.png"
+      "/images/aggression-1.png",
+      "/images/aggression-2.png",
+      "/images/aggression-3.png",
+      "/images/aggression-4.png"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
@@ -21,7 +24,10 @@ export const products = [
     salePrice: 799,
     image: "/images/king-energy-1.png",
     gallery: [
-      "/images/king-energy-1.png"
+      "/images/king-energy-1.png",
+      "/images/king-energy-2.png",
+      "/images/king-energy-3.png",
+      "/images/king-energy-4.png"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
@@ -35,7 +41,9 @@ export const products = [
     salePrice: 799,
     image: "/images/virat-kohli-1.png",
     gallery: [
-      "/images/virat-kohli-1.png"
+      "/images/virat-kohli-1.png",
+      "/images/virat-kohli-2.png",
+      "/images/virat-kohli-3.png"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
@@ -49,7 +57,9 @@ export const products = [
     salePrice: 799,
     image: "/images/anime-1.png",
     gallery: [
-      "/images/anime-1.png"
+      "/images/anime-1.png",
+      "/images/anime-2.png",
+      "/images/anime-3.png"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
@@ -77,7 +87,9 @@ export const products = [
     salePrice: 599,
     image: "/images/fake-smile-1.jpg",
     gallery: [
-      "/images/fake-smile-1.jpg"
+      "/images/fake-smile-1.jpg",
+      "/images/fake-smile-2.jpg",
+      "/images/fake-smile-3.jpg"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
@@ -91,7 +103,9 @@ export const products = [
     salePrice: 599,
     image: "/images/hidden-truth-1.png",
     gallery: [
-      "/images/hidden-truth-1.png"
+      "/images/hidden-truth-1.png",
+      "/images/hidden-truth-2.jpg",
+      "/images/hidden-truth-3.jpg"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
@@ -105,7 +119,11 @@ export const products = [
     salePrice: 599,
     image: "/images/shadow-ninja-1.jpg",
     gallery: [
-      "/images/shadow-ninja-1.jpg"
+      "/images/shadow-ninja-1.jpg",
+      "/images/shadow-ninja-2.jpg",
+      "/images/shadow-ninja-3.jpg",
+      "/images/shadow-ninja-4.jpg",
+      "/images/shadow-ninja-5.jpg"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
@@ -119,7 +137,9 @@ export const products = [
     salePrice: 899,
     image: "/images/spider-man-1.jpg",
     gallery: [
-      "/images/spider-man-1.jpg"
+      "/images/spider-man-1.jpg",
+      "/images/spider-man-2.jpg",
+      "/images/spider-man-3.jpg"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,

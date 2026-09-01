@@ -5,8 +5,8 @@ import { products } from "@/data/products";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function GallerySlider() {
-  const allImages = products.flatMap(p => [p.image, ...(p.gallery || [])]).filter(Boolean);
-  const uniqueImages = [...new Set(allImages)];
+  // Show only the main image for each product in the global gallery to avoid repetition
+  const uniqueImages = [...new Set(products.map(p => p.image).filter(Boolean))];
   
   const [current, setCurrent] = useState(0);
   const scrollContainerRef = useRef(null);
