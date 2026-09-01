@@ -85,7 +85,7 @@ export function Header() {
         ))}
       </div>
       {/* Top Header Row (Logo, Search, Cart) */}
-      <div className="bg-white/50 backdrop-blur-md border-b border-gray-200 relative z-20">
+      <div className="bg-transparent relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20 sm:h-24 lg:h-32 gap-4 relative">
 
@@ -93,14 +93,16 @@ export function Header() {
 
             {/* Logo */}
             <div className="flex shrink-0 items-center">
-              <Link href="/" className="flex items-center h-full py-2">
+              <Link href="/" className="relative flex items-center justify-center">
+                {/* Circular background scaled to the width of the logo to touch C and S */}
+                <div className="absolute aspect-square w-[102%] bg-white/50 backdrop-blur-sm rounded-full -z-10"></div>
                 <img src="/images/logo.png" alt="Cool Canvas Logo" className="h-16 sm:h-20 lg:h-24 w-auto object-contain" />
               </Link>
             </div>
 
             {/* Search Bar - Desktop & Tablet */}
-            <div className="hidden sm:flex flex-1 justify-center items-center px-4">
-              <div className="w-full max-w-lg relative" ref={searchRef}>
+            <div className="hidden sm:flex absolute left-1/2 transform -translate-x-1/2 justify-center items-center w-full max-w-[500px] z-10 pointer-events-none">
+              <div className="w-full relative pointer-events-auto" ref={searchRef}>
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
@@ -111,7 +113,7 @@ export function Header() {
                   }}
                   onFocus={() => setIsSearchActive(true)}
                   placeholder="Search tees, hoodies, oversized..."
-                  className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-transparent rounded-full text-sm font-medium focus:outline-none focus:bg-white focus:border-black focus:ring-1 focus:ring-black transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-sm border border-transparent rounded-full text-sm font-medium focus:outline-none focus:bg-white focus:border-black focus:ring-1 focus:ring-black transition-all"
                 />
 
                 {/* Search Dropdown */}
@@ -157,10 +159,10 @@ export function Header() {
                 <motion.div
                   animate={{
                     width: isSearchActive ? "180px" : "40px",
-                    backgroundColor: isSearchActive ? "#f3f4f6" : "transparent"
+                    backgroundColor: "rgba(255, 255, 255, 0.5)"
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="relative flex items-center h-10 rounded-full"
+                  className="relative flex items-center h-10 rounded-full backdrop-blur-sm"
                 >
                   <AnimatePresence>
                     {!isSearchActive ? (
@@ -239,14 +241,14 @@ export function Header() {
               </div>
 
               {/* Mobile Contact Icon */}
-              <Link href="/contact" className="lg:hidden p-2 text-black hover:text-gray-600" aria-label="Contact">
+              <Link href="/contact" className="lg:hidden p-2.5 rounded-full bg-white/50 backdrop-blur-sm text-black hover:bg-white/70 transition-colors" aria-label="Contact">
                 <Phone className="h-6 w-6" />
               </Link>
 
               {/* Cart Icon */}
               <Link
                 href="/cart"
-                className={`relative p-2 transition-colors ${isAnimating ? "text-blue-600 scale-110" : "text-black hover:text-gray-600"} transform duration-200`}
+                className={`relative p-2.5 rounded-full bg-white/50 backdrop-blur-sm transition-colors ${isAnimating ? "text-blue-600 scale-110" : "text-black hover:bg-white/70"} transform duration-200`}
                 aria-label="Cart"
               >
                 <ShoppingBag className="h-6 w-6" />
@@ -263,14 +265,14 @@ export function Header() {
 
       {/* Desktop Navigation Tier (Floating below the white header) */}
       <div className="w-full pointer-events-none relative pb-6">
-        <div className="hidden lg:flex items-center justify-center gap-2 p-1.5 mt-4 mx-auto bg-white/50 backdrop-blur-md border border-gray-200 rounded-full w-fit shadow-lg pointer-events-auto">
+        <div className="hidden lg:flex items-center justify-between p-1.5 mt-2 mx-auto bg-white/50 backdrop-blur-md border border-gray-200 rounded-full w-full max-w-[500px] shadow-lg pointer-events-auto">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`relative text-[15px] transition-colors px-5 py-2 rounded-full z-10 ${isActive
+                className={`relative flex items-center justify-center h-10 text-[15px] leading-none transition-colors px-5 rounded-full z-10 ${isActive
                     ? "text-white font-semibold shadow-sm"
                     : "text-gray-600 hover:text-black hover:bg-gray-200/50 font-semibold"
                   }`}
@@ -300,7 +302,7 @@ export function Header() {
               <Link
                 key={`mobile-${link.name}`}
                 href={link.href}
-                className={`relative snap-center text-[12px] whitespace-nowrap transition-colors px-3.5 py-2.5 rounded-full z-10 ${isActive
+                className={`relative flex items-center justify-center snap-center h-9 text-[12px] leading-none whitespace-nowrap transition-colors px-4 rounded-full z-10 ${isActive
                     ? "text-white font-semibold shadow-sm"
                     : "text-gray-600 hover:text-black font-semibold"
                   }`}
