@@ -7,7 +7,7 @@ import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export default function CheckoutPage() {
-  const { cart, cartTotal, directCheckoutItem, setDirectCheckoutItem } = useCart();
+  const { cart, cartTotal, directCheckoutItem, setDirectCheckoutItem, updateQuantity } = useCart();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -17,9 +17,27 @@ export default function CheckoutPage() {
     pincode: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   const checkoutCart = directCheckoutItem ? [directCheckoutItem] : cart;
-  const checkoutTotal = directCheckoutItem ? (directCheckoutItem.salePrice * directCheckoutItem.quantity) : cartTotal;
+  const subtotal = directCheckoutItem ? (directCheckoutItem.salePrice * directCheckoutItem.quantity) : cartTotal;
+  
+  const unique599Ids = new Set(checkoutCart.filter(item => item.salePrice === 599).map(item => item.id));
+  const hasPremiumProduct = checkoutCart.some(item => item.salePrice !== 599);
+  const are599Eligible = unique599Ids.size >= 2 || hasPremiumProduct;
+
+  let discountAmount = 0;
+  if (discountApplied) {
+    checkoutCart.forEach(item => {
+      if (item.salePrice !== 599 || are599Eligible) {
+        discountAmount += (item.salePrice * item.quantity) * 0.10;
+      }
+    });
+  }
+
+  const checkoutTotal = subtotal - discountAmount;
 
   const handleUpdateQuantity = (item, newQuantity) => {
     if (newQuantity < 1 || newQuantity > (item.stock || 10)) return;
@@ -37,6 +55,27 @@ export default function CheckoutPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleApplyCoupon = (e) => {
+    e.preventDefault();
+    setCouponError("");
+    if (couponCode.toUpperCase() === "NEW10") {
+      const unique599IdsLocal = new Set(checkoutCart.filter(item => item.salePrice === 599).map(item => item.id));
+      const hasPremiumLocal = checkoutCart.some(item => item.salePrice !== 599);
+      const are599EligibleLocal = unique599IdsLocal.size >= 2 || hasPremiumLocal;
+      const hasEligibleItems = hasPremiumLocal || are599EligibleLocal;
+
+      if (hasEligibleItems) {
+        setDiscountApplied(true);
+      } else {
+        setDiscountApplied(false);
+        setCouponError("This offer requires at least 2 different ₹599 products or any premium product.");
+      }
+    } else {
+      setCouponError("Invalid coupon code.");
+      setDiscountApplied(false);
+    }
+  };
+
   const handleCheckout = async (e) => {
     e.preventDefault();
     if (checkoutCart.length === 0) {
@@ -51,7 +90,7 @@ export default function CheckoutPage() {
 Products:
 ${checkoutCart.map(item => `- ${item.title} (Size: ${item.size}, Qty: ${item.quantity}) - Rs. ${item.salePrice * item.quantity}\n  Product Image: ${window.location.origin}${item.image}`).join('\n\n')}
 
-Total: Rs. ${checkoutTotal}
+${discountApplied && discountAmount > 0 ? `Subtotal: Rs. ${subtotal.toFixed(2)}\nDiscount (NEW10): - Rs. ${discountAmount.toFixed(2)}\n` : ''}Total: Rs. ${checkoutTotal.toFixed(2)}
 
 Shipping Address:
 ${formData.address}, ${formData.pincode}
@@ -121,14 +160,51 @@ Email: ${formData.email}`;
             ))}
           </ul>
 
+          <div className="py-6 border-t border-gray-200">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Discount code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3 border outline-none bg-white"
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  couponCode.trim() ? "bg-black text-white hover:bg-gray-800" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
+              >
+                Apply
+              </button>
+            </div>
+            {discountApplied && (
+              <p className="text-green-600 text-sm mt-2 font-medium">
+                'NEW10' applied! 10% discount on eligible items.
+              </p>
+            )}
+            {couponError && (
+              <p className="text-red-600 text-sm mt-2 font-medium">
+                {couponError}
+              </p>
+            )}
+          </div>
+
           <dl className="space-y-4 border-t border-gray-200 pt-6 text-sm font-medium text-gray-900">
             <div className="flex items-center justify-between">
               <dt className="text-gray-500">Subtotal</dt>
-              <dd>Rs. {checkoutTotal.toFixed(2)}</dd>
+              <dd>Rs. {subtotal.toFixed(2)}</dd>
             </div>
+            {discountApplied && discountAmount > 0 && (
+              <div className="flex items-center justify-between text-green-600">
+                <dt>Discount (NEW10)</dt>
+                <dd>- Rs. {discountAmount.toFixed(2)}</dd>
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <dt className="text-gray-500">Shipping</dt>
-              <dd className="text-gray-900">Calculated at next step</dd>
+              <dd className="text-gray-900 uppercase font-bold text-xs tracking-wider">Free</dd>
             </div>
             <div className="flex items-center justify-between border-t border-gray-200 pt-6 text-lg font-bold">
               <dt className="text-base text-gray-900">Total</dt>

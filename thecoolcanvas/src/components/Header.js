@@ -18,7 +18,6 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const searchRef = useRef(null);
   const mobileSearchRef = useRef(null);
 
@@ -26,7 +25,6 @@ export function Header() {
     { name: "Home", href: "/" },
     { name: "Collections", href: "/collections" },
     { name: "Premium Collection", href: "/premium-collection" },
-    { name: "Virat Kohli Collection", href: "/virat-kohli-collection" },
     { name: "Contact", href: "/contact" }
   ];
 
@@ -253,16 +251,6 @@ export function Header() {
                   </span>
                 )}
               </button>
-              {/* Mobile Hamburger Menu */}
-              <div className="lg:hidden">
-                <button
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="p-2 text-black hover:text-gray-600"
-                  aria-label="Menu"
-                >
-                  {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -286,7 +274,7 @@ export function Header() {
                   <motion.div
                     layoutId="active-nav-pill"
                     className="absolute inset-0 bg-black rounded-full -z-10"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
                   />
                 )}
                 <span className="relative z-10">{link.name}</span>
@@ -298,33 +286,33 @@ export function Header() {
 
 
 
-      {/* Mobile Navigation Drawer Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-[112px] sm:top-[128px] z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          <div className="absolute inset-x-0 top-0 bg-white border-t border-gray-200 shadow-2xl overflow-y-auto max-h-[80vh]">
-            <div className="py-2 flex flex-col">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`px-6 py-4 border-b border-gray-100 last:border-0 text-lg ${isActive ? "font-bold text-black bg-gray-50" : "font-medium text-gray-700"
-                      }`}
-                  >
-                    {link.name}
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
+      {/* Mobile Bottom Navigation Pill */}
+      <div className="lg:hidden fixed bottom-6 left-0 right-0 z-50 px-4 pointer-events-none flex justify-center">
+        <div className="flex items-center gap-1 p-1.5 bg-white/95 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl pointer-events-auto overflow-x-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={`mobile-${link.name}`}
+                href={link.href}
+                className={`relative text-[12px] whitespace-nowrap transition-colors px-3.5 py-2.5 rounded-full z-10 ${isActive
+                    ? "text-white font-semibold shadow-sm"
+                    : "text-gray-600 hover:text-black font-semibold"
+                  }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="active-mobile-nav-pill"
+                    className="absolute inset-0 bg-black rounded-full -z-10"
+                    transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
+                  />
+                )}
+                <span className="relative z-10">{link.name}</span>
+              </Link>
+            )
+          })}
         </div>
-      )}
+      </div>
     </header>
   );
 }

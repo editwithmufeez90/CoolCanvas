@@ -8,8 +8,8 @@ export const metadata = {
 };
 
 export default function PremiumCollectionPage() {
-  // Filter out the Virat Kohli product to make the "Premium" collection distinct
-  const premiumProducts = products.filter(p => !p.slug.includes("virat-kohli"));
+  // Filter out products priced at 599 from the Premium Collection
+  const premiumProducts = products.filter(p => p.salePrice !== 599);
 
   return (
     <div className="bg-white min-h-screen">
