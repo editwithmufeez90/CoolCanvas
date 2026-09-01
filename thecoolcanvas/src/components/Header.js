@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { ShoppingBag, Search, X, Menu } from "lucide-react";
+import { ShoppingBag, Search, X, Menu, Phone } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { products } from "@/data/products";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
-  const { cart, setIsCartOpen } = useCart();
+  const { cart } = useCart();
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
   const [isAnimating, setIsAnimating] = useState(false);
   const pathname = usePathname();
@@ -238,9 +238,14 @@ export function Header() {
                 </motion.div>
               </div>
 
+              {/* Mobile Contact Icon */}
+              <Link href="/contact" className="lg:hidden p-2 text-black hover:text-gray-600" aria-label="Contact">
+                <Phone className="h-6 w-6" />
+              </Link>
+
               {/* Cart Icon */}
-              <button
-                onClick={() => setIsCartOpen(true)}
+              <Link
+                href="/cart"
                 className={`relative p-2 transition-colors ${isAnimating ? "text-blue-600 scale-110" : "text-black hover:text-gray-600"} transform duration-200`}
                 aria-label="Cart"
               >
@@ -250,7 +255,7 @@ export function Header() {
                     {cartItemsCount}
                   </span>
                 )}
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -289,7 +294,7 @@ export function Header() {
       {/* Mobile Bottom Navigation Pill */}
       <div className="lg:hidden fixed bottom-6 left-0 right-0 z-50 px-4 pointer-events-none flex justify-center">
         <div className="flex items-center gap-1 p-1.5 bg-white/95 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl pointer-events-auto overflow-x-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
-          {navLinks.map((link) => {
+          {navLinks.filter(l => l.name !== "Contact").map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link

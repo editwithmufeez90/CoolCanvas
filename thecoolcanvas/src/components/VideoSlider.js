@@ -5,9 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function VideoSlider() {
   const items = [
-    { type: "image", src: "/images/virat-kohli-1.png" },
     { type: "video", src: "/images/video2.mp4" },
-    { type: "image", src: "/images/virat-kohli-2.png" },
     { type: "video", src: "/images/video1.mp4" },
   ];
 

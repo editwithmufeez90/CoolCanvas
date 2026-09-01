@@ -1,7 +1,6 @@
 import NextTopLoader from 'nextjs-toploader';
 import { Providers } from "@/components/Providers";
 import { Header } from "@/components/Header";
-import { CartDrawer } from "@/components/CartDrawer";
 import "./globals.css";
 
 export const metadata = {
@@ -32,7 +31,6 @@ export default function RootLayout({ children }) {
           <main className="min-h-screen">
             {children}
           </main>
-          <CartDrawer />
         </Providers>
       </body>
     </html>
