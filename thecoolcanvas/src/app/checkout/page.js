@@ -58,7 +58,7 @@ export default function CheckoutPage() {
   const handleApplyCoupon = (e) => {
     e.preventDefault();
     setCouponError("");
-    if (couponCode.toUpperCase() === "NEW10") {
+    if (couponCode.toUpperCase() === "FIRST10") {
       const unique599IdsLocal = new Set(checkoutCart.filter(item => item.salePrice === 599).map(item => item.id));
       const hasPremiumLocal = checkoutCart.some(item => item.salePrice !== 599);
       const are599EligibleLocal = unique599IdsLocal.size >= 2 || hasPremiumLocal;
@@ -90,7 +90,7 @@ export default function CheckoutPage() {
 Products:
 ${checkoutCart.map(item => `- ${item.title} (Size: ${item.size}, Qty: ${item.quantity}) - Rs. ${item.salePrice * item.quantity}\n  Product Image: ${window.location.origin}${item.image}`).join('\n\n')}
 
-${discountApplied && discountAmount > 0 ? `Subtotal: Rs. ${subtotal.toFixed(2)}\nDiscount (NEW10): - Rs. ${discountAmount.toFixed(2)}\n` : ''}Total: Rs. ${checkoutTotal.toFixed(2)}
+${discountApplied && discountAmount > 0 ? `Subtotal: Rs. ${subtotal.toFixed(2)}\nDiscount (FIRST10): - Rs. ${discountAmount.toFixed(2)}\n` : ''}Total: Rs. ${checkoutTotal.toFixed(2)}
 
 Shipping Address:
 ${formData.address}, ${formData.pincode}
@@ -181,7 +181,7 @@ Email: ${formData.email}`;
             </div>
             {discountApplied && (
               <p className="text-green-600 text-sm mt-2 font-medium">
-                'NEW10' applied! 10% discount on eligible items.
+                'FIRST10' applied! 10% discount on eligible items.
               </p>
             )}
             {couponError && (
@@ -198,7 +198,7 @@ Email: ${formData.email}`;
             </div>
             {discountApplied && discountAmount > 0 && (
               <div className="flex items-center justify-between text-green-600">
-                <dt>Discount (NEW10)</dt>
+                <dt>Discount (FIRST10)</dt>
                 <dd>- Rs. {discountAmount.toFixed(2)}</dd>
               </div>
             )}

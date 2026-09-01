@@ -85,7 +85,7 @@ export function Header() {
         ))}
       </div>
       {/* Top Header Row (Logo, Search, Cart) */}
-      <div className="bg-white border-b border-gray-200 relative z-20">
+      <div className="bg-white/50 backdrop-blur-md border-b border-gray-200 relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20 sm:h-24 lg:h-32 gap-4 relative">
 
@@ -263,7 +263,7 @@ export function Header() {
 
       {/* Desktop Navigation Tier (Floating below the white header) */}
       <div className="w-full pointer-events-none relative pb-6">
-        <div className="hidden lg:flex items-center justify-center gap-2 p-1.5 mt-4 mx-auto bg-white/90 backdrop-blur-md border border-gray-200 rounded-full w-fit shadow-lg pointer-events-auto">
+        <div className="hidden lg:flex items-center justify-center gap-2 p-1.5 mt-4 mx-auto bg-white/50 backdrop-blur-md border border-gray-200 rounded-full w-fit shadow-lg pointer-events-auto">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -279,7 +279,7 @@ export function Header() {
                   <motion.div
                     layoutId="active-nav-pill"
                     className="absolute inset-0 bg-black rounded-full -z-10"
-                    transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
+                    transition={{ type: "spring", stiffness: 250, damping: 22, mass: 1.2 }}
                   />
                 )}
                 <span className="relative z-10">{link.name}</span>
@@ -293,14 +293,14 @@ export function Header() {
 
       {/* Mobile Bottom Navigation Pill */}
       <div className="lg:hidden fixed bottom-6 left-0 right-0 z-50 px-4 pointer-events-none flex justify-center">
-        <div className="flex items-center gap-1 p-1.5 bg-white/95 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl pointer-events-auto overflow-x-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
+        <div className="flex items-center gap-1 p-1.5 bg-white/50 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl pointer-events-auto overflow-x-auto scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
           {navLinks.filter(l => l.name !== "Contact").map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={`mobile-${link.name}`}
                 href={link.href}
-                className={`relative text-[12px] whitespace-nowrap transition-colors px-3.5 py-2.5 rounded-full z-10 ${isActive
+                className={`relative snap-center text-[12px] whitespace-nowrap transition-colors px-3.5 py-2.5 rounded-full z-10 ${isActive
                     ? "text-white font-semibold shadow-sm"
                     : "text-gray-600 hover:text-black font-semibold"
                   }`}
@@ -309,7 +309,7 @@ export function Header() {
                   <motion.div
                     layoutId="active-mobile-nav-pill"
                     className="absolute inset-0 bg-black rounded-full -z-10"
-                    transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
+                    transition={{ type: "spring", stiffness: 250, damping: 22, mass: 1.2 }}
                   />
                 )}
                 <span className="relative z-10">{link.name}</span>
