@@ -6,7 +6,7 @@ import { useCart } from "@/context/CartContext";
 import { ShoppingBag, Search, X, Menu, Phone } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { products } from "@/data/products";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 
 export function Header() {
   const { cart } = useCart();
@@ -20,6 +20,84 @@ export function Header() {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const searchRef = useRef(null);
   const mobileSearchRef = useRef(null);
+  const [hoveredPath, setHoveredPath] = useState(null);
+  
+  const isSearchMounted = useRef(false);
+  const mobileSearchControls = useAnimation();
+  const contactControls = useAnimation();
+  const cartControls = useAnimation();
+  const logoControls = useAnimation();
+
+  useEffect(() => {
+    if (!isSearchMounted.current) {
+      isSearchMounted.current = true;
+      mobileSearchControls.set({ width: isSearchActive ? "180px" : "40px", backgroundColor: "rgba(255, 255, 255, 0.5)", x: 0 });
+      contactControls.set({ x: 0, scaleX: 1, scaleY: 1, rotate: 0 });
+      cartControls.set({ x: 0, scaleX: 1, scaleY: 1, rotate: 0 });
+      logoControls.set({ x: 0, scaleX: 1, scaleY: 1, rotate: 0 });
+      return;
+    }
+    
+    // Physics-based Domino & Magnetic Animation when Search Bar Expands/Collapses
+    // Only run this physics simulation on mobile (width < 640px)
+    if (window.innerWidth >= 640) return;
+
+    if (isSearchActive) {
+      // EXPAND (Magnetic Pull leftward for right icons, Push for logo)
+      logoControls.start({
+        x: [0, -10, 3, -1, 0], // Hit by expanding search
+        scaleX: [1, 0.9, 1.05, 0.98, 1],
+        transition: { duration: 0.5, ease: "easeInOut" }
+      });
+      mobileSearchControls.start({
+        width: "180px",
+        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        x: [0, -5, 0],
+        transition: { 
+          width: { type: "spring", stiffness: 400, damping: 15 },
+          backgroundColor: { duration: 0.4 },
+          x: { duration: 0.4, ease: "easeInOut" }
+        }
+      });
+      contactControls.start({
+        x: [0, -12, 4, -1, 0], // Sucked left towards search
+        scaleX: [1, 0.9, 1.1, 0.95, 1],
+        transition: { duration: 0.5, ease: "easeInOut", delay: 0.05 }
+      });
+      cartControls.start({
+        x: [0, -10, 3, -1, 0], // Sucked left towards contact
+        scaleX: [1, 0.95, 1.05, 0.98, 1],
+        transition: { duration: 0.5, ease: "easeInOut", delay: 0.1 }
+      });
+    } else {
+      // COLLAPSE (Domino push rightward for right icons, Vacuum pull for logo)
+      logoControls.start({
+        x: [0, 10, -2, 1, 0], // Pulled by collapsing search vacuum
+        scaleX: [1, 1.05, 0.95, 1.02, 1],
+        transition: { duration: 0.5, ease: "easeInOut" }
+      });
+      mobileSearchControls.start({
+        width: "40px",
+        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        x: [0, 15, -2, 0], // Bumps into contact
+        transition: { 
+          width: { type: "spring", stiffness: 400, damping: 15 },
+          backgroundColor: { duration: 0.4 },
+          x: { duration: 0.5, ease: "easeInOut" }
+        }
+      });
+      contactControls.start({
+        x: [0, 12, -4, 1, 0], // Hit by search, bumps into cart
+        scaleX: [1, 1.1, 0.9, 1.05, 1],
+        transition: { duration: 0.5, ease: "easeInOut", delay: 0.1 }
+      });
+      cartControls.start({
+        x: [0, 8, -2, 1, 0], // Hit by contact
+        scaleX: [1, 1.05, 0.95, 1.02, 1],
+        transition: { duration: 0.5, ease: "easeInOut", delay: 0.15 }
+      });
+    }
+  }, [isSearchActive, mobileSearchControls, contactControls, cartControls]);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -92,17 +170,23 @@ export function Header() {
 
 
             {/* Logo */}
-            <div className="flex shrink-0 items-center">
+            <motion.div animate={logoControls} className="flex shrink-0 items-center origin-left">
               <Link href="/" className="relative flex items-center justify-center">
                 {/* Circular background scaled to the width of the logo to touch C and S */}
                 <div className="absolute aspect-square w-[102%] bg-white/50 backdrop-blur-sm rounded-full -z-10"></div>
                 <img src="/images/logo.png" alt="Cool Canvas Logo" className="h-16 sm:h-20 lg:h-24 w-auto object-contain" />
               </Link>
-            </div>
+            </motion.div>
 
             {/* Search Bar - Desktop & Tablet */}
             <div className="hidden sm:flex absolute left-1/2 transform -translate-x-1/2 justify-center items-center w-full max-w-[500px] z-10 pointer-events-none">
-              <div className="w-full relative pointer-events-auto" ref={searchRef}>
+              <motion.div 
+                className="w-full relative pointer-events-auto" 
+                ref={searchRef}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              >
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
@@ -148,7 +232,7 @@ export function Header() {
                     </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
             </div>
 
             {/* Right Actions (Mobile Menu + Mobile Search + Cart) */}
@@ -157,11 +241,13 @@ export function Header() {
               {/* Mobile Expandable Inline Search */}
               <div className="sm:hidden flex items-center justify-end z-50" ref={mobileSearchRef}>
                 <motion.div
-                  animate={{
+                  animate={mobileSearchControls}
+                  initial={{
                     width: isSearchActive ? "180px" : "40px",
                     backgroundColor: "rgba(255, 255, 255, 0.5)"
                   }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   className="relative flex items-center h-10 rounded-full backdrop-blur-sm"
                 >
                   <AnimatePresence>
@@ -241,23 +327,39 @@ export function Header() {
               </div>
 
               {/* Mobile Contact Icon */}
-              <Link href="/contact" className="lg:hidden p-2.5 rounded-full bg-white/50 backdrop-blur-sm text-black hover:bg-white/70 transition-colors" aria-label="Contact">
-                <Phone className="h-6 w-6" />
-              </Link>
+              <motion.div
+                animate={contactControls}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                className="lg:hidden block"
+              >
+                <Link href="/contact" className="block p-2.5 rounded-full bg-white/50 backdrop-blur-sm text-black hover:bg-white/70 transition-colors" aria-label="Contact">
+                  <Phone className="h-6 w-6" />
+                </Link>
+              </motion.div>
 
               {/* Cart Icon */}
-              <Link
-                href="/cart"
-                className={`relative p-2.5 rounded-full bg-white/50 backdrop-blur-sm transition-colors ${isAnimating ? "text-blue-600 scale-110" : "text-black hover:bg-white/70"} transform duration-200`}
-                aria-label="Cart"
+              <motion.div
+                animate={cartControls}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                className="block"
               >
-                <ShoppingBag className="h-6 w-6" />
-                {cartItemsCount > 0 && (
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
-                    {cartItemsCount}
-                  </span>
-                )}
-              </Link>
+                <Link
+                  href="/cart"
+                  className={`block relative p-2.5 rounded-full bg-white/50 backdrop-blur-sm transition-colors ${isAnimating ? "text-blue-600 scale-110" : "text-black hover:bg-white/70"} transform duration-200`}
+                  aria-label="Cart"
+                >
+                  <ShoppingBag className="h-6 w-6" />
+                  {cartItemsCount > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                </Link>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -265,29 +367,34 @@ export function Header() {
 
       {/* Desktop Navigation Tier (Floating below the white header) */}
       <div className="w-full pointer-events-none relative pb-6">
-        <div className="hidden lg:flex items-center justify-between p-1.5 mt-2 mx-auto bg-white/50 backdrop-blur-md border border-gray-200 rounded-full w-full max-w-[500px] shadow-lg pointer-events-auto">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`relative flex items-center justify-center h-10 text-[15px] leading-none transition-colors px-5 rounded-full z-10 ${isActive
-                    ? "text-white font-semibold shadow-sm"
-                    : "text-gray-600 hover:text-black hover:bg-gray-200/50 font-semibold"
-                  }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="active-nav-pill"
-                    className="absolute inset-0 bg-black rounded-full -z-10"
-                    transition={{ type: "spring", stiffness: 250, damping: 22, mass: 1.2 }}
-                  />
-                )}
-                <span className="relative z-10">{link.name}</span>
-              </Link>
-            )
-          })}
+        <div 
+          className="hidden lg:flex p-1.5 mt-2 mx-auto bg-white/50 backdrop-blur-md border border-gray-200 rounded-full w-full max-w-[500px] shadow-lg pointer-events-auto"
+        >
+          <div className="flex items-center justify-between w-full relative rounded-full overflow-hidden">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`relative flex items-center justify-center h-10 text-[15px] leading-none transition-colors px-5 rounded-full z-10 ${isActive
+                      ? "text-white font-semibold shadow-sm"
+                      : "text-gray-600 hover:text-black font-semibold"
+                    }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-black rounded-full -z-10"
+                      transition={{ type: "spring", stiffness: 250, damping: 22, mass: 1.2 }}
+                    />
+                  )}
+                  <span className="relative z-10">{link.name}</span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </div>
 
@@ -295,29 +402,39 @@ export function Header() {
 
       {/* Mobile Bottom Navigation Pill */}
       <div className="lg:hidden fixed bottom-6 left-0 right-0 z-50 px-4 pointer-events-none flex justify-center">
-        <div className="flex items-center gap-1 p-1.5 bg-white/50 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl pointer-events-auto overflow-x-auto scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
-          {navLinks.filter(l => l.name !== "Contact").map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={`mobile-${link.name}`}
-                href={link.href}
-                className={`relative flex items-center justify-center snap-center h-9 text-[12px] leading-none whitespace-nowrap transition-colors px-4 rounded-full z-10 ${isActive
-                    ? "text-white font-semibold shadow-sm"
-                    : "text-gray-600 hover:text-black font-semibold"
-                  }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="active-mobile-nav-pill"
-                    className="absolute inset-0 bg-black rounded-full -z-10"
-                    transition={{ type: "spring", stiffness: 250, damping: 22, mass: 1.2 }}
-                  />
-                )}
-                <span className="relative z-10">{link.name}</span>
-              </Link>
-            )
-          })}
+        <div 
+          className="p-1.5 bg-white/50 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl pointer-events-auto overflow-x-auto scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden" 
+          style={{ scrollbarWidth: "none" }}
+          onMouseLeave={() => setHoveredPath(null)}
+        >
+          <div className="flex items-center gap-1 rounded-full overflow-hidden relative w-max mx-auto">
+            {navLinks.filter(l => l.name !== "Contact").map((link) => {
+              const isActive = pathname === link.href;
+              const isHovered = hoveredPath === link.href;
+              const showIndicator = hoveredPath ? isHovered : isActive;
+              
+              return (
+                <Link
+                  key={`mobile-${link.name}`}
+                  href={link.href}
+                  onMouseEnter={() => setHoveredPath(link.href)}
+                  className={`relative flex items-center justify-center snap-center h-9 text-[12px] leading-none whitespace-nowrap transition-colors px-4 rounded-full z-10 ${showIndicator
+                      ? "text-white font-semibold shadow-sm"
+                      : "text-gray-600 hover:text-black font-semibold"
+                    }`}
+                >
+                  {showIndicator && (
+                    <motion.div
+                      layoutId="active-mobile-nav-pill"
+                      className="absolute inset-0 bg-black rounded-full -z-10"
+                      transition={{ type: "spring", stiffness: 250, damping: 22, mass: 1.2 }}
+                    />
+                  )}
+                  <span className="relative z-10">{link.name}</span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </div>
     </header>
