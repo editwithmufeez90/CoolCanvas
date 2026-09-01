@@ -406,6 +406,17 @@ export function Header() {
           className="p-1.5 bg-white/50 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl pointer-events-auto overflow-x-auto scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden" 
           style={{ scrollbarWidth: "none" }}
           onMouseLeave={() => setHoveredPath(null)}
+          onTouchMove={(e) => {
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (element) {
+              const link = element.closest('a[data-nav-link="true"]');
+              if (link) {
+                setHoveredPath(link.getAttribute('href'));
+              }
+            }
+          }}
+          onTouchEnd={() => setHoveredPath(null)}
         >
           <div className="flex items-center gap-1 rounded-full overflow-hidden relative w-max mx-auto">
             {navLinks.filter(l => l.name !== "Contact").map((link) => {
@@ -417,6 +428,7 @@ export function Header() {
                 <Link
                   key={`mobile-${link.name}`}
                   href={link.href}
+                  data-nav-link="true"
                   onMouseEnter={() => setHoveredPath(link.href)}
                   className={`relative flex items-center justify-center snap-center h-9 text-[12px] leading-none whitespace-nowrap transition-colors px-4 rounded-full z-10 ${showIndicator
                       ? "text-white font-semibold shadow-sm"
