@@ -96,5 +96,55 @@ export const products = [
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
     description: "Premium heavy-weight oversized T-shirt featuring exclusive 'Fake Smile' custom artwork. Built for comfort, durability, and a bold streetwear aesthetic. 100% Cotton."
+  },
+  {
+    id: "p7",
+    slug: "hidden-truth-customized-oversized-t-shirt",
+    title: "Hidden Truth Customized Oversized T-shirt",
+    originalPrice: 856,
+    salePrice: 599,
+    image: "/images/hidden-truth-1.png",
+    gallery: [
+      "/images/hidden-truth-1.png",
+      "/images/hidden-truth-2.jpg",
+      "/images/hidden-truth-3.jpg"
+    ],
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    stock: 10,
+    description: "Premium heavy-weight oversized T-shirt featuring custom artwork. Built for comfort, durability, and a bold streetwear aesthetic. 100% Cotton."
+  },
+  {
+    id: "p8",
+    slug: "shadow-ninja-oversized-customized-t-shirt",
+    title: "Shadow Ninja Oversized Customized T-shirt",
+    originalPrice: 856,
+    salePrice: 599,
+    image: "/images/shadow-ninja-1.jpg",
+    gallery: [
+      "/images/shadow-ninja-1.jpg",
+      "/images/shadow-ninja-2.jpg",
+      "/images/shadow-ninja-3.jpg",
+      "/images/shadow-ninja-4.jpg",
+      "/images/shadow-ninja-5.jpg"
+    ],
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    stock: 10,
+    description: "Premium heavy-weight oversized T-shirt featuring exclusive 'Shadow Ninja' custom artwork. Built for comfort, durability, and a bold streetwear aesthetic. 100% Cotton."
+  },
+  {
+    id: "p9",
+    slug: "spider-man-customized-oversized-t-shirt",
+    title: "Spider Man Customized Oversized T-shirt",
+    originalPrice: 1284,
+    salePrice: 899,
+    image: "/images/spider-man-1.jpg",
+    gallery: [
+      "/images/spider-man-1.jpg",
+      "/images/spider-man-2.jpg",
+      "/images/spider-man-3.jpg"
+    ],
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    stock: 10,
+    description: "Premium heavy-weight oversized T-shirt featuring exclusive 'Spider Man' custom artwork. Built for comfort, durability, and a bold streetwear aesthetic. 100% Cotton."
   }
 ];
