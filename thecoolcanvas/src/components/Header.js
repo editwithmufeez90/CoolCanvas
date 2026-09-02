@@ -417,9 +417,20 @@ export function Header() {
               }
             }
           }}
-          onTouchEnd={() => {
-            if (hoveredPath && hoveredPath !== pathname) {
-              router.push(hoveredPath);
+          onTouchEnd={(e) => {
+            let finalPath = hoveredPath;
+            if (e.changedTouches && e.changedTouches.length > 0) {
+              const touch = e.changedTouches[0];
+              const element = document.elementFromPoint(touch.clientX, touch.clientY);
+              if (element) {
+                const link = element.closest('a[data-nav-link="true"]');
+                if (link) {
+                  finalPath = link.getAttribute('href');
+                }
+              }
+            }
+            if (finalPath && finalPath !== pathname) {
+              router.push(finalPath);
             }
             setHoveredPath(null);
           }}
