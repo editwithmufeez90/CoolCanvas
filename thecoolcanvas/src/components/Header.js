@@ -388,7 +388,7 @@ export function Header() {
                     <motion.div
                       layoutId="active-nav-pill"
                       className="absolute inset-0 bg-black rounded-full -z-10"
-                      transition={{ type: "spring", stiffness: 500, damping: 30, mass: 0.5 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.9 }}
                     />
                   )}
                   <span className="relative z-10">{link.name}</span>
@@ -456,7 +456,7 @@ export function Header() {
                     <motion.div
                       layoutId="active-mobile-nav-pill"
                       className="absolute inset-0 bg-black rounded-full -z-10"
-                      transition={{ type: "spring", stiffness: 500, damping: 30, mass: 0.5 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.9 }}
                     />
                   )}
                   <span className="relative z-10">{link.name}</span>
