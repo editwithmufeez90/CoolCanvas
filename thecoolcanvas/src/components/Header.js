@@ -22,6 +22,7 @@ export function Header() {
   const searchRef = useRef(null);
   const mobileSearchRef = useRef(null);
   const [hoveredPath, setHoveredPath] = useState(null);
+  const touchPathRef = useRef(null);
   
   const isSearchMounted = useRef(false);
   const mobileSearchControls = useAnimation();
@@ -413,12 +414,14 @@ export function Header() {
             if (element) {
               const link = element.closest('a[data-nav-link="true"]');
               if (link) {
-                setHoveredPath(link.getAttribute('href'));
+                const href = link.getAttribute('href');
+                setHoveredPath(href);
+                touchPathRef.current = href;
               }
             }
           }}
           onTouchEnd={(e) => {
-            let finalPath = hoveredPath;
+            let finalPath = touchPathRef.current || hoveredPath;
             if (e.changedTouches && e.changedTouches.length > 0) {
               const touch = e.changedTouches[0];
               const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -433,6 +436,7 @@ export function Header() {
               router.push(finalPath);
             }
             setHoveredPath(null);
+            touchPathRef.current = null;
           }}
         >
           <div className="flex items-center gap-1 rounded-full overflow-hidden relative w-max mx-auto">
