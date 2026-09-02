@@ -167,12 +167,12 @@ Email: ${formData.email}`;
                 placeholder="Discount code"
                 value={couponCode}
                 onChange={(e) => setCouponCode(e.target.value)}
-                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3 border outline-none bg-white"
+                className="flex-1 rounded-full border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3 border outline-none bg-white"
               />
               <button
                 type="button"
                 onClick={handleApplyCoupon}
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                className={`px-4 py-2 rounded-full font-medium transition-colors ${
                   couponCode.trim() ? "bg-black text-white hover:bg-gray-800" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                 }`}
               >
@@ -244,7 +244,7 @@ Email: ${formData.email}`;
                     placeholder="Email address"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border transition-colors outline-none"
+                    className="block w-full rounded-full border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border transition-colors outline-none"
                   />
                   <input
                     type="tel"
@@ -257,7 +257,7 @@ Email: ${formData.email}`;
                     placeholder="Phone number (10 digits)"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none"
+                    className="block w-full rounded-full border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none"
                   />
                 </div>
                 <label className="flex items-center space-x-2 text-sm text-gray-600">
@@ -271,7 +271,7 @@ Email: ${formData.email}`;
               <h2 className="text-xl font-medium text-gray-900 mb-6">Delivery</h2>
               <div className="space-y-4">
                 <div className="relative">
-                  <select className="block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none bg-white">
+                  <select className="block w-full rounded-full border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none bg-white">
                     <option>India</option>
                   </select>
                 </div>
@@ -284,7 +284,7 @@ Email: ${formData.email}`;
                   placeholder="Full name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none"
+                  className="block w-full rounded-full border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none"
                 />
 
                 <input
@@ -295,7 +295,7 @@ Email: ${formData.email}`;
                   placeholder="Address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none"
+                  className="block w-full rounded-full border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none"
                 />
 
                 <input
@@ -309,14 +309,14 @@ Email: ${formData.email}`;
                   placeholder="PIN code (6 digits)"
                   value={formData.pincode}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none"
+                  className="block w-full rounded-full border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm p-3.5 border outline-none"
                 />
               </div>
             </div>
 
             <div className="mb-10">
               <h2 className="text-xl font-medium text-gray-900 mb-6">Payment</h2>
-              <div className="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-gray-500 text-center flex flex-col items-center">
+              <div className="bg-gray-50 border border-gray-200 rounded-3xl p-4 text-sm text-gray-500 text-center flex flex-col items-center">
                 <CheckCircle2 className="w-8 h-8 text-green-600 mb-2" />
                 <p>All transactions are secure and encrypted.</p>
                 <p className="mt-2 text-xs">You will be redirected to WhatsApp to complete your purchase via UPI.</p>
@@ -326,7 +326,7 @@ Email: ${formData.email}`;
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-md bg-black px-4 py-4 text-base font-bold text-white hover:bg-gray-800 transition-colors disabled:opacity-50"
+              className="w-full rounded-full bg-black px-4 py-4 text-base font-bold text-white hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
               {isSubmitting ? "Processing..." : "Pay now"}
             </button>

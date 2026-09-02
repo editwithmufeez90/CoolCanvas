@@ -65,7 +65,7 @@ export default function CartPage() {
                         </div>
 
                         <div className="mt-4 sm:mt-0 sm:pr-9 flex flex-col items-start sm:items-end gap-4">
-                          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                          <div className="flex items-center border border-gray-300 rounded-full overflow-hidden">
                             <button 
                               onClick={() => updateQuantity(product.id, product.size, product.quantity - 1)}
                               className="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors"

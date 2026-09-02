@@ -34,7 +34,7 @@ export default function ContactPage() {
                   href="https://wa.me/919004049682" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="mt-6 inline-block bg-black text-white px-8 py-4 rounded-md font-bold text-base hover:bg-gray-800 transition-colors uppercase tracking-widest shadow-lg hover:shadow-xl w-full sm:w-auto"
+                  className="mt-6 inline-block bg-black text-white px-8 py-4 rounded-full font-bold text-base hover:bg-gray-800 transition-colors uppercase tracking-widest shadow-lg hover:shadow-xl w-full sm:w-auto"
                 >
                   Chat on WhatsApp
                 </a>
@@ -58,7 +58,7 @@ export default function ContactPage() {
                       id="name"
                       name="Name" 
                       required
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-colors" 
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-colors" 
                       placeholder="Your Name"
                     />
                   </div>
@@ -69,7 +69,7 @@ export default function ContactPage() {
                       id="email"
                       name="Email" 
                       required
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-colors" 
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-colors" 
                       placeholder="your@email.com"
                     />
                   </div>
@@ -81,13 +81,13 @@ export default function ContactPage() {
                     name="Message" 
                     rows={5}
                     required
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-colors" 
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-colors resize-none" 
                     placeholder="How can we help?"
                   ></textarea>
                 </div>
                 <button 
                   type="submit"
-                  className="w-full bg-gray-900 text-white px-8 py-4 rounded-lg font-bold text-base hover:bg-black transition-colors"
+                  className="w-full bg-gray-900 text-white px-8 py-4 rounded-full font-bold text-base hover:bg-black transition-colors"
                 >
                   Send Message
                 </button>
