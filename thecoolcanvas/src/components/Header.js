@@ -240,7 +240,7 @@ export function Header() {
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
 
               {/* Mobile Expandable Inline Search */}
-              <div className="sm:hidden flex items-center justify-end z-50" ref={mobileSearchRef}>
+              <div className="sm:hidden flex items-center justify-end z-50 relative" ref={mobileSearchRef}>
                 <motion.div
                   animate={mobileSearchControls}
                   initial={{
@@ -249,7 +249,7 @@ export function Header() {
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative flex items-center h-10 rounded-full backdrop-blur-md border border-white/40"
+                  className="relative flex items-center h-10 rounded-full backdrop-blur-md border border-white/40 z-10"
                 >
                   <AnimatePresence>
                     {!isSearchActive ? (
@@ -288,43 +288,43 @@ export function Header() {
                         >
                           <X className="w-4 h-4" />
                         </button>
-
-                        {/* Inline Mobile Results */}
-                        {searchQuery && (
-                          <div className="absolute top-full right-0 w-[240px] mt-4 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl shadow-2xl overflow-hidden z-50">
-                            <div className="max-h-80 overflow-y-auto">
-                              {searchResults.length > 0 ? (
-                                <div className="py-2">
-                                  {searchResults.map(product => (
-                                    <Link
-                                      href={`/product/${product.slug}`}
-                                      key={product.id}
-                                      onClick={() => {
-                                        setIsSearchActive(false);
-                                        setSearchQuery("");
-                                      }}
-                                      className="flex items-center gap-3 px-3 py-2 hover:bg-white/40 transition-colors border-b border-white/40 last:border-0"
-                                    >
-                                      <img src={product.image} alt={product.title} className="w-10 h-10 rounded object-cover" />
-                                      <div className="flex-1">
-                                        <p className="text-xs font-bold text-gray-900 line-clamp-1">{product.title}</p>
-                                        <p className="text-[10px] text-red-600 font-bold">Rs. {product.salePrice}</p>
-                                      </div>
-                                    </Link>
-                                  ))}
-                                </div>
-                              ) : (
-                                <div className="p-4 text-center text-gray-500 text-xs">
-                                  No products found
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </motion.div>
+
+                {/* Inline Mobile Results */}
+                {isSearchActive && searchQuery && (
+                  <div className="absolute top-full right-0 w-[240px] mt-2 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl shadow-2xl overflow-hidden z-50">
+                    <div className="max-h-80 overflow-y-auto">
+                      {searchResults.length > 0 ? (
+                        <div className="py-2">
+                          {searchResults.map(product => (
+                            <Link
+                              href={`/product/${product.slug}`}
+                              key={product.id}
+                              onClick={() => {
+                                setIsSearchActive(false);
+                                setSearchQuery("");
+                              }}
+                              className="flex items-center gap-3 px-3 py-2 hover:bg-white/40 transition-colors border-b border-white/40 last:border-0"
+                            >
+                              <img src={product.image} alt={product.title} className="w-10 h-10 rounded object-cover" />
+                              <div className="flex-1">
+                                <p className="text-xs font-bold text-gray-900 line-clamp-1">{product.title}</p>
+                                <p className="text-[10px] text-red-600 font-bold">Rs. {product.salePrice}</p>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-4 text-center text-gray-500 text-xs">
+                          No products found
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Mobile Contact Icon */}
