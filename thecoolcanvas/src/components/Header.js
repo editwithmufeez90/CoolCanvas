@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { ShoppingBag, Search, X, Menu, Phone } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
@@ -13,6 +13,7 @@ export function Header() {
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
   const [isAnimating, setIsAnimating] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   // Search & Mobile Menu state
   const [searchQuery, setSearchQuery] = useState("");
@@ -345,7 +346,7 @@ export function Header() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                className="block"
+                className="hidden sm:block"
               >
                 <Link
                   href="/cart"
@@ -416,7 +417,12 @@ export function Header() {
               }
             }
           }}
-          onTouchEnd={() => setHoveredPath(null)}
+          onTouchEnd={() => {
+            if (hoveredPath && hoveredPath !== pathname) {
+              router.push(hoveredPath);
+            }
+            setHoveredPath(null);
+          }}
         >
           <div className="flex items-center gap-1 rounded-full overflow-hidden relative w-max mx-auto">
             {navLinks.filter(l => l.name !== "Contact").map((link) => {
@@ -449,6 +455,21 @@ export function Header() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Floating Cart (Shows only if cart has items) */}
+      {cartItemsCount > 0 && (
+        <div className="sm:hidden fixed bottom-24 right-4 z-50 pointer-events-auto">
+          <Link
+            href="/cart"
+            className="flex items-center justify-center w-14 h-14 bg-black text-white rounded-full shadow-2xl relative"
+          >
+            <ShoppingBag className="w-6 h-6" />
+            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+              {cartItemsCount}
+            </span>
+          </Link>
+        </div>
+      )}
     </header>
   );
 }
