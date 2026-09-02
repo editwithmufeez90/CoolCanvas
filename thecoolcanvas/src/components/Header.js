@@ -433,9 +433,14 @@ export function Header() {
               }
             }
             if (finalPath && finalPath !== pathname) {
-              router.push(finalPath);
+              setHoveredPath(finalPath); // keep it highlighted on the final path
+              setTimeout(() => {
+                router.push(finalPath);
+                setTimeout(() => setHoveredPath(null), 50); // clear hover state slightly after push
+              }, 300); // 300ms delay to let the squish animation finish
+            } else {
+              setHoveredPath(null);
             }
-            setHoveredPath(null);
             touchPathRef.current = null;
           }}
         >
