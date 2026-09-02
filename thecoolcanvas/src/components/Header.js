@@ -203,7 +203,7 @@ export function Header() {
 
                 {/* Search Dropdown */}
                 {isSearchActive && searchQuery && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-50">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white/50 backdrop-blur-md border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-50">
                     <div className="max-h-96 overflow-y-auto">
                       {searchResults.length > 0 ? (
                         <div className="py-2">
@@ -291,7 +291,7 @@ export function Header() {
 
                         {/* Inline Mobile Results */}
                         {searchQuery && (
-                          <div className="absolute top-full right-0 w-[240px] mt-4 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-50">
+                          <div className="absolute top-full right-0 w-[240px] mt-4 bg-white/50 backdrop-blur-md border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-50">
                             <div className="max-h-80 overflow-y-auto">
                               {searchResults.length > 0 ? (
                                 <div className="py-2">
