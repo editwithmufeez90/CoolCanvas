@@ -380,7 +380,7 @@ export function Header() {
                   key={link.name}
                   href={link.href}
                   className={`relative flex items-center justify-center h-10 text-[15px] leading-none transition-colors px-5 rounded-full z-10 ${isActive
-                      ? "text-white font-semibold shadow-sm"
+                      ? "text-white font-semibold"
                       : "text-gray-600 hover:text-black font-semibold"
                     }`}
                 >
@@ -448,7 +448,7 @@ export function Header() {
                   data-nav-link="true"
                   onMouseEnter={() => setHoveredPath(link.href)}
                   className={`relative flex items-center justify-center snap-center h-9 text-[12px] leading-none whitespace-nowrap transition-colors px-4 rounded-full z-10 ${showIndicator
-                      ? "text-white font-semibold shadow-sm"
+                      ? "text-white font-semibold"
                       : "text-gray-600 hover:text-black font-semibold"
                     }`}
                 >
