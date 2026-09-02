@@ -198,12 +198,12 @@ export function Header() {
                   }}
                   onFocus={() => setIsSearchActive(true)}
                   placeholder="Search tees, hoodies, oversized..."
-                  className="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-sm border border-transparent rounded-full text-sm font-medium focus:outline-none focus:bg-white focus:border-black focus:ring-1 focus:ring-black transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-white/60 backdrop-blur-md border border-white/40 rounded-full text-sm font-medium focus:outline-none focus:bg-white/70 focus:border-white/60 focus:ring-1 focus:ring-white/60 transition-all text-black placeholder-gray-600"
                 />
 
                 {/* Search Dropdown */}
                 {isSearchActive && searchQuery && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white/80 backdrop-blur-md border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-50">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl shadow-2xl overflow-hidden z-50">
                     <div className="max-h-96 overflow-y-auto">
                       {searchResults.length > 0 ? (
                         <div className="py-2">
@@ -215,7 +215,7 @@ export function Header() {
                                 setIsSearchActive(false);
                                 setSearchQuery("");
                               }}
-                              className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+                              className="flex items-center gap-4 px-4 py-3 hover:bg-white/40 transition-colors border-b border-white/40 last:border-0"
                             >
                               <img src={product.image} alt={product.title} className="w-12 h-12 rounded object-cover" />
                               <div className="flex-1">
@@ -245,11 +245,11 @@ export function Header() {
                   animate={mobileSearchControls}
                   initial={{
                     width: isSearchActive ? "180px" : "40px",
-                    backgroundColor: "rgba(255, 255, 255, 0.5)"
+                    backgroundColor: "rgba(255, 255, 255, 0.6)"
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative flex items-center h-10 rounded-full backdrop-blur-sm"
+                  className="relative flex items-center h-10 rounded-full backdrop-blur-md border border-white/40"
                 >
                   <AnimatePresence>
                     {!isSearchActive ? (
@@ -280,7 +280,7 @@ export function Header() {
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Search..."
-                          className="w-full bg-transparent border-none focus:outline-none text-sm pl-2"
+                          className="w-full bg-transparent border-none focus:outline-none text-sm pl-2 text-black placeholder-gray-600"
                         />
                         <button
                           onClick={() => { setIsSearchActive(false); setSearchQuery(""); }}
@@ -291,7 +291,7 @@ export function Header() {
 
                         {/* Inline Mobile Results */}
                         {searchQuery && (
-                          <div className="absolute top-full right-0 w-[240px] mt-4 bg-white/80 backdrop-blur-md border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-50">
+                          <div className="absolute top-full right-0 w-[240px] mt-4 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl shadow-2xl overflow-hidden z-50">
                             <div className="max-h-80 overflow-y-auto">
                               {searchResults.length > 0 ? (
                                 <div className="py-2">
@@ -303,7 +303,7 @@ export function Header() {
                                         setIsSearchActive(false);
                                         setSearchQuery("");
                                       }}
-                                      className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                                      className="flex items-center gap-3 px-3 py-2 hover:bg-white/40 transition-colors border-b border-white/40 last:border-0"
                                     >
                                       <img src={product.image} alt={product.title} className="w-10 h-10 rounded object-cover" />
                                       <div className="flex-1">
