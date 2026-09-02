@@ -408,41 +408,43 @@ export function Header() {
           className="p-1.5 bg-white/50 backdrop-blur-md border border-gray-200 rounded-full shadow-2xl pointer-events-auto overflow-x-auto scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden" 
           style={{ scrollbarWidth: "none" }}
           onMouseLeave={() => setHoveredPath(null)}
-          onTouchMove={(e) => {
-            const touch = e.touches[0];
-            const element = document.elementFromPoint(touch.clientX, touch.clientY);
-            if (element) {
-              const link = element.closest('a[data-nav-link="true"]');
-              if (link) {
-                const href = link.getAttribute('href');
-                setHoveredPath(href);
-                touchPathRef.current = href;
-              }
-            }
-          }}
-          onTouchEnd={(e) => {
-            let finalPath = touchPathRef.current || hoveredPath;
-            if (e.changedTouches && e.changedTouches.length > 0) {
-              const touch = e.changedTouches[0];
-              const element = document.elementFromPoint(touch.clientX, touch.clientY);
-              if (element) {
-                const link = element.closest('a[data-nav-link="true"]');
-                if (link) {
-                  finalPath = link.getAttribute('href');
-                }
-              }
-            }
-            if (finalPath && finalPath !== pathname) {
-              setHoveredPath(finalPath); // keep it highlighted on the final path
-              setTimeout(() => {
-                router.push(finalPath);
-                setTimeout(() => setHoveredPath(null), 50); // clear hover state slightly after push
-              }, 300); // 300ms delay to let the squish animation finish
-            } else {
-              setHoveredPath(null);
-            }
-            touchPathRef.current = null;
-          }}
+          // --- TEMPORARILY DISABLED FINGER SWIPE TRACKING ---
+          // onTouchMove={(e) => {
+          //   const touch = e.touches[0];
+          //   const element = document.elementFromPoint(touch.clientX, touch.clientY);
+          //   if (element) {
+          //     const link = element.closest('a[data-nav-link="true"]');
+          //     if (link) {
+          //       const href = link.getAttribute('href');
+          //       setHoveredPath(href);
+          //       touchPathRef.current = href;
+          //     }
+          //   }
+          // }}
+          // onTouchEnd={(e) => {
+          //   let finalPath = touchPathRef.current || hoveredPath;
+          //   if (e.changedTouches && e.changedTouches.length > 0) {
+          //     const touch = e.changedTouches[0];
+          //     const element = document.elementFromPoint(touch.clientX, touch.clientY);
+          //     if (element) {
+          //       const link = element.closest('a[data-nav-link="true"]');
+          //       if (link) {
+          //         finalPath = link.getAttribute('href');
+          //       }
+          //     }
+          //   }
+          //   if (finalPath && finalPath !== pathname) {
+          //     setHoveredPath(finalPath); // keep it highlighted on the final path
+          //     setTimeout(() => {
+          //       router.push(finalPath);
+          //       setTimeout(() => setHoveredPath(null), 50); // clear hover state slightly after push
+          //     }, 300); // 300ms delay to let the squish animation finish
+          //   } else {
+          //     setHoveredPath(null);
+          //   }
+          //   touchPathRef.current = null;
+          // }}
+          // ------------------------------------------------
         >
           <div className="flex items-center gap-1 rounded-full overflow-hidden relative w-max mx-auto">
             {navLinks.filter(l => l.name !== "Contact").map((link) => {
