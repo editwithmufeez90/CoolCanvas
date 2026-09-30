@@ -144,5 +144,22 @@ export const products = [
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock: 10,
     description: "Premium heavy-weight oversized T-shirt featuring exclusive 'Spider Man' custom artwork. Built for comfort, durability, and a bold streetwear aesthetic. 100% Cotton."
+  },
+  {
+    id: "p10",
+    slug: "hitman-customize-oversized-t-shirt",
+    title: "Hitman Customize Oversized Tshirt",
+    originalPrice: 1141,
+    salePrice: 799,
+    image: "/images/hitman-1.png",
+    gallery: [
+      "/images/hitman-1.png",
+      "/images/hitman-2.png",
+      "/images/hitman-3.png",
+      "/images/hitman-4.png"
+    ],
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    stock: 10,
+    description: "Premium heavy-weight oversized T-shirt featuring exclusive 'Hitman' custom artwork. Built for comfort, durability, and a bold streetwear aesthetic. 100% Cotton."
   }
 ];
