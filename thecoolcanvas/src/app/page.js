@@ -25,7 +25,7 @@ export default function Home() {
             </FadeIn>
             <FadeIn direction="left" className="w-full md:w-1/2 space-y-6 flex flex-col items-center text-center md:items-start md:text-left">
               <div className="inline-block bg-red-600 text-white px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-full">New Drop</div>
-              <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tighter uppercase leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight uppercase leading-tight">
                 {newProduct.title}
               </h2>
               <div className="flex items-center justify-center md:justify-start space-x-4 pt-2 pb-4">
