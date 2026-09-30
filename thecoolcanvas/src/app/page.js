@@ -17,8 +17,8 @@ export default function Home() {
       {/* Newly Added Section */}
       {newProduct && (
         <div className="bg-gray-50 border-b border-gray-200 overflow-hidden">
-          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-10 lg:gap-16">
-            <FadeIn direction="right" className="w-full max-w-sm mx-auto md:w-1/2 relative rounded-2xl overflow-hidden bg-white shadow-xl border border-gray-100 group">
+          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-8 md:gap-10 lg:gap-16">
+            <FadeIn direction="right" className="w-2/3 max-w-[280px] md:max-w-sm mx-auto md:w-1/2 relative rounded-2xl overflow-hidden bg-white shadow-xl border border-gray-100 group">
               <a href={`/product/${newProduct.slug}`}>
                 <img src={newProduct.image} alt={newProduct.title} className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700" />
               </a>
