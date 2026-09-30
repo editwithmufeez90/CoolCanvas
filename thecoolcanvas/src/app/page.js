@@ -28,9 +28,6 @@ export default function Home() {
               <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tighter uppercase leading-tight">
                 {newProduct.title}
               </h2>
-              <p className="text-lg text-gray-600 font-medium leading-relaxed">
-                {newProduct.description}
-              </p>
               <div className="flex items-center justify-center md:justify-start space-x-4 pt-2 pb-4">
                 <span className="text-3xl font-black text-black">Rs. {newProduct.salePrice}</span>
                 {newProduct.originalPrice && (
@@ -41,7 +38,7 @@ export default function Home() {
                 href={`/product/${newProduct.slug}`} 
                 className="inline-block bg-black text-white px-10 py-4 rounded-full font-bold text-base hover:bg-gray-800 transition-all duration-300 uppercase tracking-widest shadow-xl hover:shadow-2xl hover:-translate-y-1 text-center w-full sm:w-auto"
               >
-                Shop Now
+                Buy Now
               </a>
             </FadeIn>
           </div>
