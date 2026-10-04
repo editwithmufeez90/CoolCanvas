@@ -18,7 +18,7 @@ export default function CheckoutPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [couponCode, setCouponCode] = useState("");
-  const [discountApplied, setDiscountApplied] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState("");
 
   const checkoutCart = directCheckoutItem ? [directCheckoutItem] : cart;
@@ -26,15 +26,22 @@ export default function CheckoutPage() {
   
   const unique599Ids = new Set(checkoutCart.filter(item => item.salePrice === 599).map(item => item.id));
   const hasPremiumProduct = checkoutCart.some(item => item.salePrice !== 599);
-  const are599Eligible = unique599Ids.size >= 2 || hasPremiumProduct;
+  
+  const isCool100Eligible = unique599Ids.size >= 2 || hasPremiumProduct;
+  const isFirst10Eligible = hasPremiumProduct;
+  const is2000Eligible = subtotal >= 2000;
 
   let discountAmount = 0;
-  if (discountApplied) {
+  if (appliedCoupon === "FIRST10") {
     checkoutCart.forEach(item => {
       if (item.salePrice !== 599 || are599Eligible) {
         discountAmount += (item.salePrice * item.quantity) * 0.10;
       }
     });
+  } else if (appliedCoupon === "COOL100") {
+    discountAmount = subtotal >= 100 ? 100 : subtotal;
+  } else if (appliedCoupon === "COOL250") {
+    discountAmount = subtotal >= 250 ? 250 : subtotal;
   }
 
   const checkoutTotal = subtotal - discountAmount;
@@ -55,24 +62,41 @@ export default function CheckoutPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleApplyCoupon = (e) => {
-    e.preventDefault();
+  const handleApplyCoupon = (e, codeOverride) => {
+    if (e) e.preventDefault();
     setCouponError("");
-    if (couponCode.toUpperCase() === "FIRST10") {
+    const code = (codeOverride || couponCode).toUpperCase();
+    if (codeOverride) setCouponCode(code);
+    
+    if (code === "COOL100") {
       const unique599IdsLocal = new Set(checkoutCart.filter(item => item.salePrice === 599).map(item => item.id));
       const hasPremiumLocal = checkoutCart.some(item => item.salePrice !== 599);
-      const are599EligibleLocal = unique599IdsLocal.size >= 2 || hasPremiumLocal;
-      const hasEligibleItems = hasPremiumLocal || are599EligibleLocal;
-
-      if (hasEligibleItems) {
-        setDiscountApplied(true);
+      
+      if (unique599IdsLocal.size >= 2 || hasPremiumLocal) {
+        setAppliedCoupon(code);
       } else {
-        setDiscountApplied(false);
+        setAppliedCoupon(null);
         setCouponError("This offer requires at least 2 different ₹599 products or any premium product.");
+      }
+    } else if (code === "FIRST10") {
+      const hasPremiumLocal = checkoutCart.some(item => item.salePrice !== 599);
+
+      if (hasPremiumLocal) {
+        setAppliedCoupon(code);
+      } else {
+        setAppliedCoupon(null);
+        setCouponError("This offer requires at least 1 premium product in your cart.");
+      }
+    } else if (code === "COOL250") {
+      if (subtotal >= 2000) {
+        setAppliedCoupon(code);
+      } else {
+        setAppliedCoupon(null);
+        setCouponError("This offer requires a minimum cart value of ₹2000.");
       }
     } else {
       setCouponError("Invalid coupon code.");
-      setDiscountApplied(false);
+      setAppliedCoupon(null);
     }
   };
 
@@ -90,7 +114,7 @@ export default function CheckoutPage() {
 Products:
 ${checkoutCart.map(item => `- ${item.title} (Size: ${item.size}, Qty: ${item.quantity}) - Rs. ${item.salePrice * item.quantity}\n  Product Image: ${window.location.origin}${item.image}`).join('\n\n')}
 
-${discountApplied && discountAmount > 0 ? `Subtotal: Rs. ${subtotal.toFixed(2)}\nDiscount (FIRST10): - Rs. ${discountAmount.toFixed(2)}\n` : ''}Total: Rs. ${checkoutTotal.toFixed(2)}
+${appliedCoupon && discountAmount > 0 ? `Subtotal: Rs. ${subtotal.toFixed(2)}\nDiscount (${appliedCoupon}): - Rs. ${discountAmount.toFixed(2)}\n` : ''}Total: Rs. ${checkoutTotal.toFixed(2)}
 
 Shipping Address:
 ${formData.address}, ${formData.pincode}
@@ -171,7 +195,7 @@ Email: ${formData.email}`;
               />
               <button
                 type="button"
-                onClick={handleApplyCoupon}
+                onClick={(e) => handleApplyCoupon(e)}
                 className={`px-4 py-2 rounded-full font-medium transition-colors ${
                   couponCode.trim() ? "bg-black text-white hover:bg-gray-800" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                 }`}
@@ -179,9 +203,20 @@ Email: ${formData.email}`;
                 Apply
               </button>
             </div>
-            {discountApplied && (
+            
+            {appliedCoupon === "FIRST10" && (
               <p className="text-green-600 text-sm mt-2 font-medium">
                 'FIRST10' applied! 10% discount on eligible items.
+              </p>
+            )}
+            {appliedCoupon === "COOL100" && (
+              <p className="text-green-600 text-sm mt-2 font-medium">
+                'COOL100' applied! Flat ₹100 discount on eligible items.
+              </p>
+            )}
+            {appliedCoupon === "COOL250" && (
+              <p className="text-green-600 text-sm mt-2 font-medium">
+                'COOL250' applied! Flat ₹250 discount on your order.
               </p>
             )}
             {couponError && (
@@ -189,16 +224,84 @@ Email: ${formData.email}`;
                 {couponError}
               </p>
             )}
-          </div>
+
+              <div className="mt-5 space-y-3">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Available Offers</p>
+                <div className="flex flex-col gap-3">
+                  <div className={`border rounded-xl p-4 flex flex-col gap-3 transition-colors ${isCool100Eligible ? 'border-gray-200 bg-white cursor-pointer hover:border-black' : 'border-gray-200 bg-gray-50 opacity-80 cursor-default'}`} onClick={() => isCool100Eligible && setCouponCode("COOL100")}>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="inline-block border border-dashed border-black px-2 py-1 mb-1 rounded bg-white">
+                          <span className="font-bold text-sm tracking-wider">COOL100</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5 font-medium">Flat ₹100 off (2 different ₹599 tees or any Premium).</p>
+                      </div>
+                      {appliedCoupon === "COOL100" ? (
+                        <span className="text-xs font-bold px-4 py-2 rounded-full bg-green-100 text-green-700">Applied</span>
+                      ) : (
+                        <button type="button" disabled={!isCool100Eligible} className={`text-xs font-bold px-4 py-2 rounded-full transition-colors ${isCool100Eligible ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-500 cursor-default'}`} onClick={(e) => { e.stopPropagation(); if (isCool100Eligible) handleApplyCoupon(e, "COOL100"); }}>Apply</button>
+                      )}
+                    </div>
+                    {isCool100Eligible ? (
+                      <p className="text-xs text-green-600 font-medium">✓ You are eligible to apply this coupon!</p>
+                    ) : (
+                      <p className="text-xs text-red-500 font-medium">Add 1 more different ₹599 tee or any Premium product to unlock.</p>
+                    )}
+                  </div>
+                  
+                  <div className={`border rounded-xl p-4 flex flex-col gap-3 transition-colors ${isFirst10Eligible ? 'border-gray-200 bg-white cursor-pointer hover:border-black' : 'border-gray-200 bg-gray-50 opacity-80 cursor-default'}`} onClick={() => isFirst10Eligible && setCouponCode("FIRST10")}>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="inline-block border border-dashed border-black px-2 py-1 mb-1 rounded bg-white">
+                          <span className="font-bold text-sm tracking-wider">FIRST10</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5 font-medium">10% off (Requires at least 1 Premium product).</p>
+                      </div>
+                      {appliedCoupon === "FIRST10" ? (
+                        <span className="text-xs font-bold px-4 py-2 rounded-full bg-green-100 text-green-700">Applied</span>
+                      ) : (
+                        <button type="button" disabled={!isFirst10Eligible} className={`text-xs font-bold px-4 py-2 rounded-full transition-colors ${isFirst10Eligible ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-500 cursor-default'}`} onClick={(e) => { e.stopPropagation(); if (isFirst10Eligible) handleApplyCoupon(e, "FIRST10"); }}>Apply</button>
+                      )}
+                    </div>
+                    {isFirst10Eligible ? (
+                      <p className="text-xs text-green-600 font-medium">✓ You are eligible to apply this coupon!</p>
+                    ) : (
+                      <p className="text-xs text-red-500 font-medium">Add at least 1 Premium product to unlock.</p>
+                    )}
+                  </div>
+                  
+                  <div className={`border rounded-xl p-4 flex flex-col gap-3 transition-colors ${is2000Eligible ? 'border-gray-200 bg-white cursor-pointer hover:border-black' : 'border-gray-200 bg-gray-50 opacity-80 cursor-default'}`} onClick={() => is2000Eligible && setCouponCode("COOL250")}>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="inline-block border border-dashed border-black px-2 py-1 mb-1 rounded bg-white">
+                          <span className="font-bold text-sm tracking-wider">COOL250</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5 font-medium">Flat ₹250 off on orders above ₹2000.</p>
+                      </div>
+                      {appliedCoupon === "COOL250" ? (
+                        <span className="text-xs font-bold px-4 py-2 rounded-full bg-green-100 text-green-700">Applied</span>
+                      ) : (
+                        <button type="button" disabled={!is2000Eligible} className={`text-xs font-bold px-4 py-2 rounded-full transition-colors ${is2000Eligible ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-500 cursor-default'}`} onClick={(e) => { e.stopPropagation(); if (is2000Eligible) handleApplyCoupon(e, "COOL250"); }}>Apply</button>
+                      )}
+                    </div>
+                    {is2000Eligible ? (
+                      <p className="text-xs text-green-600 font-medium">✓ You are eligible to apply this coupon!</p>
+                    ) : (
+                      <p className="text-xs text-red-500 font-medium">Add items worth ₹{(2000 - subtotal).toFixed(2)} more to unlock.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
 
           <dl className="space-y-4 border-t border-gray-200 pt-6 text-sm font-medium text-gray-900">
             <div className="flex items-center justify-between">
               <dt className="text-gray-500">Subtotal</dt>
               <dd>Rs. {subtotal.toFixed(2)}</dd>
             </div>
-            {discountApplied && discountAmount > 0 && (
+            {appliedCoupon && discountAmount > 0 && (
               <div className="flex items-center justify-between text-green-600">
-                <dt>Discount (FIRST10)</dt>
+                <dt>Discount ({appliedCoupon})</dt>
                 <dd>- Rs. {discountAmount.toFixed(2)}</dd>
               </div>
             )}

@@ -6,7 +6,7 @@ import { useState, use } from "react";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
-import { Minus, Plus, Check, Share2 } from "lucide-react";
+import { Minus, Plus, Check, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ProductPage({ params }) {
   const unwrappedParams = use(params);
@@ -20,18 +20,39 @@ export default function ProductPage({ params }) {
   }
 
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
-  const [activeImage, setActiveImage] = useState(product.image);
+  const [selectedColor, setSelectedColor] = useState(product.colors ? product.colors[0] : null);
+  const [activeImage, setActiveImage] = useState(product.colors ? product.colors[0].image : product.image);
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
 
+  const gallery = selectedColor ? selectedColor.gallery : product.gallery;
+  const activeIndex = gallery?.indexOf(activeImage) !== -1 ? gallery?.indexOf(activeImage) : 0;
+
+  const handlePrev = () => {
+    if (!gallery) return;
+    const newIdx = activeIndex === 0 ? gallery.length - 1 : activeIndex - 1;
+    setActiveImage(gallery[newIdx]);
+  };
+
+  const handleNext = () => {
+    if (!gallery) return;
+    const newIdx = activeIndex === gallery.length - 1 ? 0 : activeIndex + 1;
+    setActiveImage(gallery[newIdx]);
+  };
+
+  const handleColorSelect = (color) => {
+    setSelectedColor(color);
+    setActiveImage(color.image);
+  };
+
   const handleAddToCart = () => {
-    addToCart(product, selectedSize, quantity);
+    addToCart({ ...product, image: activeImage }, selectedSize, quantity, selectedColor?.name);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
-    setDirectCheckoutItem({ ...product, size: selectedSize, quantity });
+    setDirectCheckoutItem({ ...product, size: selectedSize, color: selectedColor?.name, quantity });
     router.push("/checkout");
   };
 
@@ -73,18 +94,43 @@ export default function ProductPage({ params }) {
           
           {/* Left Column: Image Gallery */}
           <div className="flex flex-col gap-4">
-            {/* Main Image */}
-            <div className="w-full relative aspect-[3/4] lg:aspect-auto lg:h-[700px] rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center">
+            
+            {/* Desktop Main Image with Arrows */}
+            <div className="hidden lg:flex w-full relative h-[700px] rounded-2xl overflow-hidden bg-gray-100 items-center justify-center group">
               <img
                 src={activeImage}
                 alt={product.title}
                 className="w-full h-full object-cover"
               />
+              <button 
+                onClick={handlePrev} 
+                className="absolute left-4 p-3 bg-white/90 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110 text-black hover:bg-white"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button 
+                onClick={handleNext} 
+                className="absolute right-4 p-3 bg-white/90 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110 text-black hover:bg-white"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Mobile Scrollable Images (Hidden on Desktop) */}
+            <div className="flex lg:hidden w-full aspect-[3/4] rounded-2xl overflow-x-auto snap-x snap-mandatory scrollbar-hide overscroll-x-contain">
+              {gallery?.map((img, idx) => (
+                <img 
+                  key={idx} 
+                  src={img} 
+                  alt={`${product.title} ${idx + 1}`} 
+                  className="min-w-full h-full object-cover snap-center" 
+                />
+              ))}
             </div>
             
-            {/* Thumbnails */}
-            <div className="flex gap-4 overflow-x-auto p-1 pb-2 scrollbar-hide">
-              {product.gallery?.map((img, idx) => (
+            {/* Thumbnails (Hidden on Mobile) */}
+            <div className="hidden lg:flex gap-4 overflow-x-auto p-1 pb-2 scrollbar-hide">
+              {gallery?.map((img, idx) => (
                 <button 
                   key={idx}
                   className={`rounded-xl overflow-hidden shrink-0 w-24 h-24 lg:w-28 lg:h-28 transition-all ${activeImage === img ? 'ring-2 ring-black ring-offset-2' : 'hover:opacity-75'}`}
@@ -132,8 +178,8 @@ export default function ProductPage({ params }) {
               )}
             </div>
             
-            <p className="text-sm text-gray-500 mb-6 underline underline-offset-4 decoration-gray-300">
-              Shipping calculated at checkout.
+            <p className="text-sm font-bold text-green-600 mb-6 uppercase tracking-widest">
+              Free Shipping
             </p>
 
             {/* Stock indicator */}
@@ -144,6 +190,33 @@ export default function ProductPage({ params }) {
               </span>
               <p className="text-sm text-gray-700 font-medium">Low stock: {product.stock || 10} left</p>
             </div>
+
+            {/* Colors */}
+            {product.colors && (
+              <div className="mb-6">
+                <label className="text-sm font-medium text-gray-900 block mb-3">Color: <span className="font-bold text-gray-700">{selectedColor?.name}</span></label>
+                <div className="flex flex-wrap gap-3">
+                  {product.colors.map((color) => (
+                    <button
+                      key={color.name}
+                      onClick={() => handleColorSelect(color)}
+                      className={`relative w-10 h-10 rounded-full border-2 transition-all ${
+                        selectedColor?.name === color.name
+                          ? "border-black shadow-md scale-110"
+                          : "border-gray-200 hover:border-gray-400"
+                      }`}
+                      style={{ backgroundColor: color.value }}
+                      title={color.name}
+                    >
+                      {/* For White color, add a subtle inner border */}
+                      {color.name.toLowerCase() === 'white' && (
+                        <span className="absolute inset-0 rounded-full border border-gray-200" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Variants / Sizes */}
             <div className="mb-6">

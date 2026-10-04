@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 export function HeroSlider() {
@@ -23,16 +23,22 @@ export function HeroSlider() {
   const [isDragging, setIsDragging] = useState(false);
 
   const minSwipeDistance = 50;
+  const hasDraggedRef = useRef(false);
 
   const handleTouchStart = (clientX) => {
     setTouchStart(clientX);
     setIsDragging(true);
     setDragOffset(0);
+    hasDraggedRef.current = false;
   };
 
   const handleTouchMove = (clientX) => {
     if (touchStart === null) return;
-    setDragOffset(clientX - touchStart);
+    const offset = clientX - touchStart;
+    setDragOffset(offset);
+    if (Math.abs(offset) > 10) {
+      hasDraggedRef.current = true;
+    }
   };
 
   const handleTouchEnd = () => {
@@ -47,6 +53,10 @@ export function HeroSlider() {
     
     setTouchStart(null);
     setDragOffset(0);
+    
+    setTimeout(() => {
+      hasDraggedRef.current = false;
+    }, 50);
   };
 
   useEffect(() => {
@@ -71,7 +81,15 @@ export function HeroSlider() {
   };
 
   // Estimate item width for dragging calculation
-  const itemWidth = typeof window !== "undefined" ? Math.min(window.innerWidth * 0.85, 1200) : 300;
+  const getBannerWidth = () => {
+    if (typeof window === "undefined") return 300;
+    const w = window.innerWidth;
+    if (w >= 1280) return Math.min(w * 0.35, 1200); // xl
+    if (w >= 1024) return Math.min(w * 0.40, 1200); // lg
+    if (w >= 768) return Math.min(w * 0.65, 1200);  // md
+    return Math.min(w * 0.85, 1200);
+  };
+  const itemWidth = getBannerWidth();
   // How much of the item width we have dragged (e.g., -0.5 to 0.5)
   const dragProgress = isDragging ? dragOffset / itemWidth : 0;
 
@@ -91,7 +109,7 @@ export function HeroSlider() {
     >
       
       {/* Invisible placeholder to define the height of the slider dynamically based on the image size */}
-      <div className="w-[85%] md:w-[65%] lg:w-[55%] max-w-[1200px] mx-auto opacity-0 pointer-events-none">
+      <div className="w-[85%] md:w-[65%] lg:w-[40%] xl:w-[35%] max-w-[1200px] mx-auto opacity-0 pointer-events-none">
         <img src={banners[0]} className="w-full h-auto" alt="placeholder" />
       </div>
 
@@ -129,14 +147,18 @@ export function HeroSlider() {
           return (
             <div 
               key={index} 
-              className={`absolute top-0 h-full w-[85%] md:w-[65%] lg:w-[55%] max-w-[1200px] left-1/2 ${isCenterPointer ? 'cursor-auto' : 'cursor-pointer'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
+              className={`absolute top-0 h-full w-[85%] md:w-[65%] lg:w-[40%] xl:w-[35%] max-w-[1200px] left-1/2 ${isCenterPointer ? 'cursor-auto' : 'cursor-pointer'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
               style={{
                 transform: `translateX(${translateX}%) scale(${scale})`,
                 zIndex,
                 opacity
               }}
-              onClick={() => {
-                if (!isCenterPointer && !isDragging) {
+              onClick={(e) => {
+                if (hasDraggedRef.current) {
+                  e.preventDefault();
+                  return;
+                }
+                if (!isCenterPointer) {
                   setCurrent(index);
                 }
               }}
@@ -146,8 +168,9 @@ export function HeroSlider() {
                 className={`block w-full h-full rounded-2xl overflow-hidden shadow-2xl ${!isCenterPointer && 'pointer-events-none'} ${isDragging ? 'transition-none' : 'transition-all duration-700 ease-out'}`}
                 style={{ filter: `blur(${blurValue}px)` }}
                 onClick={(e) => {
-                  if (Math.abs(dragOffset) > 10) e.preventDefault();
+                  if (hasDraggedRef.current) e.preventDefault();
                 }}
+                onDragStart={(e) => e.preventDefault()}
               >
                 <img src={banner} className="w-full h-full object-cover" alt={`Banner ${index + 1}`} draggable="false" />
               </Link>

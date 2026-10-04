@@ -7,7 +7,7 @@ import { FAQ } from "@/components/FAQ";
 import { FadeIn } from "@/components/FadeIn";
 
 export default function Home() {
-  const newProduct = products.find(p => p.id === "p10");
+  const newProduct = products[0];
 
   return (
     <div className="bg-white">

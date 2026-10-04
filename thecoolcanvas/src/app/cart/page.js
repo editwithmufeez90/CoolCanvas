@@ -36,7 +36,7 @@ export default function CartPage() {
               <ul role="list" className="border-t border-b border-gray-200 divide-y divide-gray-200">
                 {cart.map((product, productIdx) => (
                   <motion.li 
-                    key={`${product.id}-${product.size}`}
+                    key={`${product.id}-${product.size}-${product.color || 'default'}`}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: productIdx * 0.1 }}
@@ -60,14 +60,17 @@ export default function CartPage() {
                               </Link>
                             </h3>
                           </div>
-                          <p className="mt-1 text-sm text-gray-500 font-medium">Size: {product.size}</p>
+                          <p className="mt-1 text-sm text-gray-500 font-medium">
+                            Size: {product.size}
+                            {product.color && ` | Color: ${product.color}`}
+                          </p>
                           <p className="mt-1 text-sm font-bold text-red-600">Rs. {product.salePrice}</p>
                         </div>
 
                         <div className="mt-4 sm:mt-0 sm:pr-9 flex flex-col items-start sm:items-end gap-4">
                           <div className="flex items-center border border-gray-300 rounded-full overflow-hidden">
                             <button 
-                              onClick={() => updateQuantity(product.id, product.size, product.quantity - 1)}
+                              onClick={() => updateQuantity(product.id, product.size, product.quantity - 1, product.color)}
                               className="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors"
                             >
                               <Minus className="w-4 h-4" />
@@ -76,7 +79,7 @@ export default function CartPage() {
                               {product.quantity}
                             </span>
                             <button 
-                              onClick={() => updateQuantity(product.id, product.size, product.quantity + 1)}
+                              onClick={() => updateQuantity(product.id, product.size, product.quantity + 1, product.color)}
                               className="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors"
                             >
                               <Plus className="w-4 h-4" />
@@ -85,7 +88,7 @@ export default function CartPage() {
 
                           <button
                             type="button"
-                            onClick={() => removeFromCart(product.id, product.size)}
+                            onClick={() => removeFromCart(product.id, product.size, product.color)}
                             className="text-sm font-bold text-red-600 hover:text-red-500 uppercase tracking-widest underline decoration-2 underline-offset-4"
                           >
                             Remove
@@ -120,7 +123,7 @@ export default function CartPage() {
               <div className="mt-8">
                 <Link
                   href="/checkout"
-                  className="w-full flex items-center justify-center rounded-full border border-transparent bg-black px-4 py-4 text-sm font-bold text-white shadow-md hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 transition-all uppercase tracking-widest"
+                  className="w-full block text-center rounded-full bg-black px-4 py-3 text-sm font-bold text-white shadow-md hover:bg-gray-800 hover:shadow-lg transition-all uppercase tracking-wider whitespace-nowrap"
                 >
                   Proceed to Checkout
                 </Link>
